@@ -20,6 +20,7 @@
 - [ ] in-source syntax extensiohs
 
 *DEMO*
+- [ ] lambda
 - [ ] async await with io uring backend
-- [ ] class
 - [ ] defer keyword
+- [ ] class
