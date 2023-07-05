@@ -5,8 +5,8 @@
 # include <ctype.h>
 # include <dlfcn.h>
 # include <errno.h>
-# define ULL unsigned long long
-# define LL long long# define ull unsigned long long
+# define ull unsigned long long
+# define ll long long# define ull unsigned long long
 # define STR(...) #__VA_ARGS__
 # define ALLOC(TYPE, ...) ({					\
 	TYPE *o = malloc(sizeof(TYPE));				\
@@ -204,18 +204,29 @@ char	*read_file(const char *path)
 	return src;
 }
 
-char* findLastUnescapedQuote(const char* str) {
+char* findlastunescaped(const char* str, char c) {
     int len = strlen(str);
     int i = len - 1;
 
     while (i >= 0) {
-        if (str[i] == '"' && (i == 0 || str[i - 1] != '\\')) {
+        if (str[i] == c && (i == 0 || str[i - 1] != '\\')) {
             return (char*)&str[i];
         }
         i--;
     }
 
     return NULL;
+}
+
+int isidentifier(char ch) {
+    return isalnum(ch) || ch == '_';
+}
+
+bool isoperator(char ch) {
+    return	 ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '%' ||
+			 ch == '=' || ch == '<' || ch == '>' || ch == '&' || ch == '|' ||
+		 	 ch == '^' || ch == '!' || ch == '~' || ch == '.' || ch == '?' ||
+			 ch == ':' || ch == ',' || ch == ';';
 }
 
 #endif
