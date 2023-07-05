@@ -76,12 +76,10 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 	{
 		pa = STOP;
 		it = parsers;
-		while (it && *fmt)
+		while (it)
 		{
 
 			pa = it->data(ctx, fmt, out);
-			if (!*fmt)
-				break ;
 			if (pa == STOP)
 			{
 			//	fmt += 1;
@@ -106,7 +104,7 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 			it = it->next;
 		}
 		printf("\n\nPARSED :: [%.*s]\n\n", (int)(ctx->collumn - oj_len) , fmt + 1);
-		if (!*fmt && depth)
+		if (!*fmt && depth > 1)
 		{
 			printf("ERR : unclosed tag.\n");
 			exit(0);
