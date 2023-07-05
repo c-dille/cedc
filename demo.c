@@ -169,7 +169,7 @@ int main()
 	parser_list_add(&parsers, endbracket);
 
 
-    const char *fmt = " {{{  \"stri\\\"ng\" hiii }}}    (  ";
+    const char *fmt = " {{{  \"stri\\\"ng\" hiii }}}    (";
 	ast_list	*ast = ast_list_root(0);
 	parser_context ctx = (parser_context){
 		.file_name = "<text>",

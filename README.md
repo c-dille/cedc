@@ -16,7 +16,7 @@
 - [ ] C comments
 - [x] C operators
 - [x] C identifiers
-- [ ] check memory issue
+- [x] check memory issue
 - [ ] free function
 
 *COMPILER*
