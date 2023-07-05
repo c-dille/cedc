@@ -54,24 +54,38 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 		exit (0);
 	}
 
+	if (!parsers)
+	{
+		printf("Error, cant proceed without a parser list.\n");
+		exit(0);
+	}
+
 	ull oj_len = ctx->collumn;
 	ull depth =  ctx->depth;
 	ctx->depth += 1;
 	void *oj_parent = out->data->parent;
 	ctx->collumn += 0;
 
+	if (!*fmt)
+	{
+		printf("ERR\n");
+		exit(0);
+	}
+
 	while (*fmt)
 	{
 		pa = STOP;
 		it = parsers;
-		while (it)
+		while (it && *fmt)
 		{
 
 			pa = it->data(ctx, fmt, out);
+			if (!*fmt)
+				break ;
 			if (pa == STOP)
 			{
-		//		fmt += 1;
-			//	ctx->collumn += pa + 1;
+			//	fmt += 1;
+			// 	ctx->collumn += 1;
 				break;
 			}
 			else if (pa == NEXT_SYNTAX)
@@ -91,6 +105,13 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 			}
 			it = it->next;
 		}
+		printf("\n\nPARSED :: [%.*s]\n\n", (int)(ctx->collumn - oj_len) , fmt + 1);
+		if (!*fmt && depth)
+		{
+			printf("ERR : unclosed tag.\n");
+			exit(0);
+		}
+
 		if (pa == STOP)// || pa == NEXT_SYNTAX)
 		{
 		//	printf("stop woth %llu\n", ctx->depth);
@@ -99,25 +120,27 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 		}
 		if (pa && !it)
 		{
-			printf("ERROR, UNKNOW SYNTAX [%s...]!\n", fmt);
+			printf("Parse error in file  %s:%llu:%llu [%.8s...] with depth=%llu\n", ctx->file_name, ctx->line, ctx->collumn, fmt, ctx->depth);
 			exit (0);
 		}
 	}
-	/*if (!*fmt && ctx->depth <= 1)
-	{
-		printf("Parse error, unclosed tag \n");
-		exit(0);
-	}*/
-	if (*fmt && !ctx->depth)
-			printf("Parse error in file  %s:%llu:%llu [%.8s...] with depth=%llu\n", ctx->file_name, ctx->line, ctx->collumn, fmt, ctx->depth);
 
-	//printf("\n\ngot str :: [%.*s]\n\n", (int)(ctx->collumn - oj_len) , fmt + 1);
+
+
 	//printf("\n\ngot end :: [%s]\n\n", fmt + ctx->collumn - oj_len+  1);
 	ull new_len = ctx->collumn - oj_len;
 	ctx->collumn = oj_len;
 	ctx->depth -= 1;
 
+	if (!*fmt && depth)
+	{
+		printf("Error, opened tags\n");
+		exit(0);
+	}
+
 	return (new_len);
 }
 
 #endif
+
+

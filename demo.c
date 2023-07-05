@@ -66,7 +66,7 @@ parser_action   dquote(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action   block(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   brace(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '{')
 	{
@@ -108,10 +108,15 @@ parser_action   bracket(parser_context *ctx, const char *fmt, ast_list *ast)
 
 // TODO : coorrect error check for bellow functions :
 
-parser_action   endblock(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   endbrace(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '}')
 	{
+		if (!ast->data->parent || ast->data->parent->data->type != BRACE)
+		{
+			printf("Error, unexpected closing brace.\n");
+			exit(0);
+		}
 		return STOP;
 	}
 	return NEXT_SYNTAX;
@@ -121,6 +126,11 @@ parser_action   endparenthesis(parser_context *ctx, const char *fmt, ast_list *a
 {
 	if (*fmt == ')')
 	{
+		if (!ast->data->parent || ast->data->parent->data->type != PARENTHESIS)
+		{
+			printf("Error, unexpected closing parenthesis.\n");
+			exit(0);
+		}
 		return STOP;
 	}
 	return NEXT_SYNTAX;
@@ -130,6 +140,11 @@ parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == ']')
 	{
+		if (!ast->data->parent || ast->data->parent->data->type != BRACKET)
+		{
+			printf("Error, unexpected closing bracket.\n");
+			exit(0);
+		}
 		return STOP;
 	}
 	return NEXT_SYNTAX;
@@ -145,16 +160,16 @@ int main()
 	parser_list_add(&parsers, quote);
 	parser_list_add(&parsers, dquote);
 
-	parser_list_add(&parsers, block);
+	parser_list_add(&parsers, brace);
 	parser_list_add(&parsers, parenthesis);
 	parser_list_add(&parsers, bracket);
 
-	parser_list_add(&parsers, endblock);
+	parser_list_add(&parsers, endbrace);
 	parser_list_add(&parsers, endparenthesis);
 	parser_list_add(&parsers, endbracket);
 
 
-    const char *fmt = "  {  {      {  \"stri\\\"ng\" hiii } } }";
+    const char *fmt = " {{{  \"stri\\\"ng\" hiii }}}    (  ";
 	ast_list	*ast = ast_list_root(0);
 	parser_context ctx = (parser_context){
 		.file_name = "<text>",
