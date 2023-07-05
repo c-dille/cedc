@@ -9,26 +9,40 @@ typedef enum
     NEXT_CHAR = 1,
 }   parser_action;
 
-// TODO :: ad enum for TYPES, add a 'closed' state to nodes, when closing tag : check if all parent are already closed or not, add a way to parse childs more easly
-
 typedef struct
 {
 	ULL			collumn; // only used for parse error, rest may feeded to gcc #line
 	ULL			line;
 	ULL 		deep;
 	const char	*file_name;
-	ast_list	*parent;
 }	parser_context;
-typedef parser_action(*parser)(parser_context *ctx, ast_list **ast, const char *fmt);
+typedef parser_action(*parser)(parser_context *ctx, const char *fmt, ast_list *ast);
 DEF_LIST_PROTO(parser, parser_list);
 DEF_LIST(parser, parser_list, 0);
 
 
-
-
-ast_list   *parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list *parent)
+ast_list *ast_list_root(ast_list *root)
 {
-	ast_list 		*out;
+	return ast_list_new(ALLOC(ast_node,
+		.type = "ROOT",
+		.parent = root,
+		.childs = 0
+	));
+}
+
+ast_list *ast_push(ast_list *ast, const char *type, const char *source)
+{
+	ast_list *l = ast_list_add(&ast, ALLOC(ast_node,
+		.type = type,
+		.source = source,
+		.parent = ast->data->parent
+	));
+	l->data->childs = ast_list_root(l);
+	return l;
+}
+
+ULL   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list *out)
+{
 	parser_action 	pa;
 	parser_list		*it;
 
@@ -40,8 +54,12 @@ ast_list   *parse(parser_context *ctx, parser_list *parsers, const char *fmt, as
 		exit (0);
 	}
 
+	ULL oj_len = ctx->collumn;
+	ULL deep =  ctx->deep;
+	ctx->deep += 1;
+	void *oj_parent = out->data->parent;
+	ctx->collumn += 0;
 
-	out = 0;
 	while (*fmt)
 	{
 		pa = STOP;
@@ -49,7 +67,7 @@ ast_list   *parse(parser_context *ctx, parser_list *parsers, const char *fmt, as
 		while (it)
 		{
 
-			pa = it->data(ctx, &out, fmt);
+			pa = it->data(ctx, fmt, out);
 			if (pa == STOP)
 			{
 		//		fmt += 1;
@@ -75,7 +93,7 @@ ast_list   *parse(parser_context *ctx, parser_list *parsers, const char *fmt, as
 		}
 		if (pa == STOP)// || pa == NEXT_SYNTAX)
 		{
-			printf("stop woth %i\n", ctx->deep);
+			printf("stop woth %llu\n", ctx->deep);
 		//	fmt += 1;
 			break;
 		}
@@ -91,10 +109,15 @@ ast_list   *parse(parser_context *ctx, parser_list *parsers, const char *fmt, as
 		exit(0);
 	}*/
 	if (*fmt && !ctx->deep)
-			printf("Parse error in file  %s:%llu:%llu [%.8s...] with depth=%i\n", ctx->file_name, ctx->line, ctx->collumn, fmt, ctx->deep);
+			printf("Parse error in file  %s:%llu:%llu [%.8s...] with depth=%llu\n", ctx->file_name, ctx->line, ctx->collumn, fmt, ctx->deep);
 
+	//printf("\n\ngot str :: [%.*s]\n\n", (int)(ctx->collumn - oj_len) , fmt + 1);
+	//printf("\n\ngot end :: [%s]\n\n", fmt + ctx->collumn - oj_len+  1);
+	ULL new_len = ctx->collumn - oj_len;
+	ctx->collumn = oj_len;
+	ctx->deep -= 1;
 
-	return (out);
+	return (new_len);
 }
 
 #endif

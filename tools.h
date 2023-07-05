@@ -204,4 +204,18 @@ char	*read_file(const char *path)
 	return src;
 }
 
+char* findLastUnescapedQuote(const char* str) {
+    int len = strlen(str);
+    int i = len - 1;
+
+    while (i >= 0) {
+        if (str[i] == '"' && (i == 0 || str[i - 1] != '\\')) {
+            return (char*)&str[i];
+        }
+        i--;
+    }
+
+    return NULL;
+}
+
 #endif
