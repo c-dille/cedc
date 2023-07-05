@@ -7,14 +7,14 @@ const char
 	*OPERATOR = "OPERATOR",
 	*QUOTE = "DQUOTE",
 	*DQUOTE = "DQUOTE",
-	*BRACE = "BRACE";
+	*BRACE = "BRACE",
+	*PARENTHESIS = "PARENTHESIS",
+	*BRACKET = "BRACKET";
 
 parser_action   space(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (isspace(*fmt))
-	{
 		return NEXT_CHAR;
-	}
 	return NEXT_SYNTAX;
 }
 
@@ -79,9 +79,56 @@ parser_action   block(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
+parser_action   parenthesis(parser_context *ctx, const char *fmt, ast_list *ast)
+{
+	if (*fmt == '(')
+	{
+		return
+			2 +
+			parse(ctx, parsers, fmt + 1,
+				ast_push(ast, PARENTHESIS, "()")->data->childs
+			);
+	}
+	return NEXT_SYNTAX;
+}
+
+parser_action   bracket(parser_context *ctx, const char *fmt, ast_list *ast)
+{
+	if (*fmt == '[')
+	{
+		return
+			2 +
+			parse(ctx, parsers, fmt + 1,
+				ast_push(ast, BRACKET, "[]")->data->childs
+			);
+	}
+	return NEXT_SYNTAX;
+}
+
+
+// TODO : coorrect error check for bellow functions :
+
 parser_action   endblock(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '}')
+	{
+		return STOP;
+	}
+	return NEXT_SYNTAX;
+}
+
+parser_action   endparenthesis(parser_context *ctx, const char *fmt, ast_list *ast)
+{
+	if (*fmt == ')')
+	{
+		return STOP;
+	}
+	return NEXT_SYNTAX;
+}
+
+parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
+{
+	if (*fmt == ']')
 	{
 		return STOP;
 	}
@@ -99,7 +146,13 @@ int main()
 	parser_list_add(&parsers, dquote);
 
 	parser_list_add(&parsers, block);
+	parser_list_add(&parsers, parenthesis);
+	parser_list_add(&parsers, bracket);
+
 	parser_list_add(&parsers, endblock);
+	parser_list_add(&parsers, endparenthesis);
+	parser_list_add(&parsers, endbracket);
+
 
     const char *fmt = "  {  {      {  \"stri\\\"ng\" hiii } } }";
 	ast_list	*ast = ast_list_root(0);
