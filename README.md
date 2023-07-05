@@ -13,10 +13,12 @@
 - [x] assert parsers length
 - [x] C double quotes
 - [x] C simple quotes
-- [ ] C comments
+- [x] C comments
 - [x] C operators
 - [x] C identifiers
 - [x] check memory issue
+- [ ] better debug with line / col pos
+- [ ] function to parse a file directly
 - [ ] free function
 
 *COMPILER*

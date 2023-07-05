@@ -66,6 +66,39 @@ parser_action   dquote(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
+parser_action   comment(parser_context *ctx, const char *fmt, ast_list *ast)
+{
+	if (*fmt == '/' && fmt[1] == '/' && ctx->collumn == 1)
+	{
+		ull len = 0;
+		while (fmt && fmt[len] != '\n')
+		{
+			len   += 1;
+		}
+		return len;
+	}
+	return NEXT_SYNTAX;
+}
+
+parser_action   mlcomment(parser_context *ctx, const char *fmt, ast_list *ast)
+{
+	if (fmt[0] == '/' && fmt[1] == '*')
+	{
+		ull len = 0;
+		while (fmt[len] && !(fmt[len] == '*' && fmt[len + 1] == '/'))
+		{
+			len   += 1;
+		}
+		if (!fmt[len])
+		{
+			printf("UNCLOSED MLCOMMENT\n");
+			exit(0);
+		}
+		return len + 1;
+	}
+	return NEXT_SYNTAX;
+}
+
 parser_action   brace(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '{')
@@ -104,9 +137,6 @@ parser_action   bracket(parser_context *ctx, const char *fmt, ast_list *ast)
 	}
 	return NEXT_SYNTAX;
 }
-
-
-// TODO : coorrect error check for bellow functions :
 
 parser_action   endbrace(parser_context *ctx, const char *fmt, ast_list *ast)
 {
@@ -152,7 +182,8 @@ parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
 
 int main()
 {
-
+	parser_list_add(&parsers, comment);
+	parser_list_add(&parsers, mlcomment);
 
 	parser_list_add(&parsers, space);
 	parser_list_add(&parsers, identifier);
@@ -164,12 +195,13 @@ int main()
 	parser_list_add(&parsers, parenthesis);
 	parser_list_add(&parsers, bracket);
 
+
+
 	parser_list_add(&parsers, endbrace);
 	parser_list_add(&parsers, endparenthesis);
 	parser_list_add(&parsers, endbracket);
 
-
-    const char *fmt = " {{{  \"stri\\\"ng\" hiii }}}    (";
+    const char *fmt = "  {{{  \"stri\\\"ng\" hiii }}}  /**/  ";
 	ast_list	*ast = ast_list_root(0);
 	parser_context ctx = (parser_context){
 		.file_name = "<text>",
