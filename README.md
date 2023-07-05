@@ -1,6 +1,5 @@
 # cedilla40
 
-
 ## TODO
 
 *PARSER*
@@ -15,4 +14,12 @@
 
 *COMPILER*
 - [ ] ast macro engine
-- [ ] emit #line for gcc 
+- [ ] emit #line for gcc
+
+*SYNTAX*
+- [ ] in-source syntax extensiohs
+
+*DEMO*
+- [ ] async await with io uring backend
+- [ ] class
+- [ ] defer keyword
