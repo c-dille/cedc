@@ -20,6 +20,7 @@
 - [ ] better debug with line / col pos
 - [ ] function to parse a file directly
 - [ ] free function
+- [ ] dump ast function
 
 *COMPILER*
 - [ ] ast macro engine
