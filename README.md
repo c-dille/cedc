@@ -5,12 +5,13 @@
 *PARSER*
 
 - [x] reccursive engine
-- [ ] C brackets, parethesis, braces with correct error detection
+- [x] C brackets, parethesis, braces
+- [ ] Correct error detection for pairs level
 - [x] C double quotes
-- [ ] C simple quotes
+- [x] C simple quotes
 - [ ] C comments
-- [ ] C operators
-- [ ] C identifiers
+- [x] C operators
+- [x] C identifiers
 
 *COMPILER*
 - [ ] ast macro engine
