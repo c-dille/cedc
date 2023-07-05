@@ -12,5 +12,4 @@ typedef struct  s_ast_node
 	ast_list 		*parent;
 	ast_list		*childs;
 }   ast_node;
-// todo : implement a function to set parent to all childs
 #endif

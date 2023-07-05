@@ -6,7 +6,6 @@ parser_action   block(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '{')
 	{
-		printf("BRACE! %llu\n", ctx->deep);
 		return
 			2 +
 			parse(ctx, parsers, fmt + 1,
@@ -20,12 +19,7 @@ parser_action   quote(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '"')
 	{
-		printf("FMT:%.5s\n", fmt);
-		printf("STR\n---%s\n", ast_list_last(ast)->data->type);
 		ast_list *l = ast_push(ast, "STRING", strndup(fmt + 1, findLastUnescapedQuote(fmt) - fmt - 1));
-		printf("---%s\n", l->data->source);
-
-		printf("src=%s\n", ast_list_last(ast)->data->source);
 		return findLastUnescapedQuote(fmt) - fmt + 2;
 	}
 	return NEXT_SYNTAX;
@@ -33,7 +27,6 @@ parser_action   quote(parser_context *ctx, const char *fmt, ast_list *ast)
 
 parser_action   space(parser_context *ctx, const char *fmt, ast_list *ast)
 {
-	printf("is space : [%.5s] -> %i\n", fmt, isspace(*fmt));
 	if (isspace(*fmt))
 	{
 		return NEXT_CHAR;
@@ -45,7 +38,6 @@ parser_action   endblock(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '}')
 	{
-			printf("--- end with depth = %llu\n", ctx->deep);
 		return STOP;
 	}
 	return NEXT_SYNTAX;
@@ -53,19 +45,13 @@ parser_action   endblock(parser_context *ctx, const char *fmt, ast_list *ast)
 
 int main()
 {
-
 	parser_list_add(&parsers, block);
 	parser_list_add(&parsers, quote);
 	parser_list_add(&parsers, space);
 	parser_list_add(&parsers, endblock);
 
-
     const char *fmt = "  {  {      {  \"stri\\\"ng\"  } } }";
-
-
 	ast_list	*ast = ast_list_root(0);
-
-
 	parser_context ctx = (parser_context){
 		.file_name = "<text>",
 		.line = 1,
@@ -73,16 +59,13 @@ int main()
 		.deep = 0
 	};
 
-	parse(&ctx, parsers, fmt, ast);
-
-	if (!ast)
+	if (!parse(&ctx, parsers, fmt, ast))
 		return 1;
 
     printf("AST type: %s\n", ast->next->data->type);
     printf("AST value: %s\n", ast->next->data->source);
-	printf("AST  CHILD TYPE : %s\n", ast->next->data->childs->next->data->childs->next->data->childs->next->data->type);
-
-	printf("AST  CHILD SOURCE : %s\n", ast->next->data->childs->next->data->childs->next->data->childs->next->data->source);
+	printf("AST STRING TYPE : %s\n", ast->next->data->childs->next->data->childs->next->data->childs->next->data->type);
+	printf("AST STRING SOURCE : %s\n", ast->next->data->childs->next->data->childs->next->data->childs->next->data->source);
 
     return 0;
 }

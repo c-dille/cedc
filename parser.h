@@ -93,7 +93,7 @@ ULL   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 		}
 		if (pa == STOP)// || pa == NEXT_SYNTAX)
 		{
-			printf("stop woth %llu\n", ctx->deep);
+		//	printf("stop woth %llu\n", ctx->deep);
 		//	fmt += 1;
 			break;
 		}
