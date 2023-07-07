@@ -142,7 +142,7 @@ parser_action   endbrace(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '}')
 	{
-		if (!ast->data->parent || ast->data->parent->data->type != BRACE)
+		if (ast_type(ast_parent(ast)) != BRACE)
 		{
 			printf("Error, unexpected closing brace.\n");
 			exit(0);
@@ -201,13 +201,15 @@ int main()
 	parser_list_add(&parsers, endparenthesis);
 	parser_list_add(&parsers, endbracket);
 
-    const char *fmt = "  {{{  \"stri\\\"ng\" hiii }}}  /**/  ";
+    const char *fmt = "  {{{  \"stri\\\"ng\" hiii }}}  /**/   ";
 	ast_list	*ast = ast_list_root(0);
 	parser_context ctx = (parser_context){
 		.file_name = "<text>",
 		.line = 1,
 		.collumn = 1,
-		.depth = 0
+		.depth = 0,
+		.begin_ptr = fmt,
+		.end_ptr = fmt + strlen(fmt)
 	};
 
 	if (!parse(&ctx, parsers, fmt, ast))

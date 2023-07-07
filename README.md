@@ -21,6 +21,7 @@
 - [ ] function to parse a file directly
 - [ ] free function
 - [ ] dump ast function
+- [ ] string begin / end ptr check ?? function to access more easily the parents / childs while checking error
 
 *COMPILER*
 - [ ] ast macro engine
