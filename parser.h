@@ -1,6 +1,7 @@
 #ifndef PARSER_H
 # define PARSER_H
 # include "ast.h"
+
 typedef enum
 {
     NEXT_SYNTAX = -2,

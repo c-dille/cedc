@@ -30,6 +30,12 @@
 - [ ] ast macro engine
 - [ ] emit #line for gcc
 
+1) pa parser(const char *, ast) +  ast macro(ast) + char *compiler(ast)
+2) only pa parser(const char *, ast) + char*compiler(ast)
+
+issue: macro that requires a longer parsing phase than a firstly defined compiler
+solution: ?
+
 *SYNTAX*
 - [ ] in-source syntax extensiohs
 
