@@ -107,30 +107,20 @@ ull   parse(parser_context *ctx, named_parser_list *parsers, const char *fmt, as
 	parser_action 	pa;
 	named_parser_list		*it;
 
-
 	if (ctx->depth > max_depth)
 		parse_error(ctx, "stack error, depth exceed maximum of : %llu\n", max_depth);
-
 	if (!parsers)
 		parse_error(ctx, "argument error, can not proceed without a parser list.\n");
-
 	if (fmt > ctx->end_ptr || fmt < ctx->begin_ptr)
 		parse_error(ctx, "overlapsing (grade A), one of ast parser (%s) returned an invalid length, which exceed format memory area.", it->data->name);
-
 	ctx->collumn += 1;
-
 	ull oj_line = ctx->line;
 	ull oj_collumn = ctx->collumn;
 	ull oj_depth =  ctx->depth;
-
 	const char *begi_fmt_ptr = fmt;
 	ctx->begin_ptr = fmt;
 	ctx->depth += 1;
-
-	//printf("[new parsing %.5s]\n", fmt);
-
 	pa = STOP;
-
 	while (*fmt)
 	{
 		pa = STOP;
@@ -139,13 +129,8 @@ ull   parse(parser_context *ctx, named_parser_list *parsers, const char *fmt, as
 		{
 			ctx->parser_name = it->data->name;
 			pa = it->data->f(ctx, fmt, out);
-
 			if (pa == STOP)
-			{
-			//	fmt += 1;
-			// 	ctx->collumn += 1;
 				break;
-			}
 			else if (pa == NEXT_SYNTAX)
 				;
 			else if (pa == NEW_LINE)
@@ -165,45 +150,19 @@ ull   parse(parser_context *ctx, named_parser_list *parsers, const char *fmt, as
 		}
 		if (fmt > ctx->end_ptr || fmt < ctx->begin_ptr)
 			parse_error(ctx, "overlapsing (grade B), one of ast parser (%s) returned an invalid length, which exceed format memory area.", it->data->name);
-
-		/*
-		if (pa == STOP && !fmt[1] && depth > 1)
-		{
-			printf("ERR : unclosed tag.\n");
-			exit(0);
-		}*/
-
-		if (pa == STOP)// || pa == NEXT_SYNTAX)
-		{
-		//	printf("stop woth %llu\n", ctx->depth);
-		//	fmt += 1;
+		if (pa == STOP)
 			break;
-		}
 		if (pa && !it)
 			parse_error(ctx, "unknow syntax [%.7s...].", fmt);
-
 	}
-
-/*
-	if (pa == STOP && ctx->depth == 1)
-	{
-		printf("Error, opened tag\n");
-		exit(0);
-	}
-*/
-
 	if (!*fmt && oj_depth)
 		parse_error(ctx, "opened pair.");
-
 	ull new_len = fmt - begi_fmt_ptr;
 	ctx->depth -= 1;
 	ctx->collumn = oj_collumn;
 	ctx->line = oj_line;
-
 	printf("PARSED [depth=%llu] :: [%.*s]\n", ctx->depth, (int)new_len, fmt - new_len);
-
 	ctx->collumn -= 1;
-
 	return (new_len);
 }
 
