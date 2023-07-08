@@ -14,14 +14,55 @@ typedef struct
 	ull			collumn; // only used for parse error, rest may feeded to gcc #line
 	ull			line;
 	ull 		depth;
-	const char	*file_name;
+	const char	*file_path;
 	const char 	*begin_ptr;
 	const char	*end_ptr;
+	const char 	*parser_name;
 }	parser_context;
-typedef parser_action(*parser)(parser_context *ctx, const char *fmt, ast_list *ast);
-DEF_LIST_PROTO(parser, parser_list);
-DEF_LIST(parser, parser_list, 0);
 
+
+void parse_info(parser_context *ctx, const char *msg, ...) {
+	va_list	ap;
+	printf("Parse info in %s:%llu:%llu: ", ctx->file_path, ctx->line, ctx->collumn);
+	va_start(ap, msg);
+	vprintf(msg, ap);
+	printf("\n");
+	va_end(ap);
+}
+
+void parse_error(parser_context *ctx, const char *msg, ...) {
+	va_list	ap;
+	printf("Parse error in %s:%llu:%llu: ", ctx->file_path, ctx->line, ctx->collumn);
+	va_start(ap, msg);
+	vprintf(msg, ap);
+	printf("\n");
+	va_end(ap);
+	exit(0);
+}
+
+void ast_info(const char *msg, const char *file, int line, const char *func) {
+	printf("AST info in %s:%i within %s(...): %s\n", file, line, func, msg);
+}
+
+void ast_error(const char *msg, const char *file, int line, const char *func) {
+	printf("AST error in %s:%i within %s(...): %s\n", file, line, func, msg);
+	exit(0);
+}
+
+typedef parser_action(*parser)(parser_context *ctx, const char *fmt, ast_list *ast);
+typedef struct
+{
+	parser		f;
+	const char 	*name;
+}	named_parser;
+
+DEF_LIST_PROTO(named_parser*, named_parser_list);
+DEF_LIST(named_parser*, named_parser_list, 0);
+#define alloc_named_parser(n) \
+	(ALLOC(named_parser,\
+		.name = STR(n),\
+		.f = n\
+	))\
 
 ast_list *ast_list_root(ast_list *root)
 {
@@ -43,81 +84,40 @@ ast_list *ast_push(ast_list *ast, const char *type, const char *source)
 	return l;
 }
 
-void check_ast_err(ast_list *ast, int check_data)
+int check_ast_deref(ast_list *ast, int check_data, const char *file, int line, const char *func)
 {
 	if (!ast)
-	{
-		printf("Trying to access parent from a null ast ptr.\n");
-		exit(0);
-	}
-
+		ast_error("Trying to access parent from a null ast ptr.", file, line, func);
 	if (!ast->data && check_data)
-	{
-		printf("Trying to access parent from a null ast->data ptr.");
-		exit (0);
-	}
+		ast_error("Trying to access parent from a null ast->data ptr.", file, line, func);
+	return 0;
 }
 
-#define ast_parent(ast) (_ast_parent(ctx, ast, __FUNCTION__, __FILE__, __LINE__))
-ast_list *_ast_parent(parser_context *ctx, ast_list *ast, const char * func, const char * file, ull line)
-{
+#define ast_parent(ast)	(check_ast_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->parent)
+#define ast_type(ast) 	(check_ast_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->type)
+#define ast_source(ast) (check_ast_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->source)
+#define ast_childs(ast) (check_ast_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->childs)
+#define ast_next(ast) (check_ast_deref(ast, 0, __FILE__, __LINE__, __FUNCTION__) + ast->next)
+#define ast_prev(ast) (check_ast_deref(ast, 0, __FILE__, __LINE__, __FUNCTION__) + ast->prev)
 
-	check_ast_err(ast, 1);
-	return ast->data->parent;
-}
+const ull max_depth = 7;
 
-#define ast_type(ast) (_ast_type(ctx, ast, __FUNCTION__, __FILE__, __LINE__))
-const char *_ast_type(parser_context *ctx, ast_list *ast, const char * func, const char * file, ull line)
-{
-	check_ast_err(ast, 1);
-	return ast->data->type;
-}
-
-#define ast_source(ast) (_ast_source(ctx, ast, __FUNCTION__, __FILE__, __LINE__))
-const char *_ast_source(parser_context *ctx, ast_list *ast, const char * func, const char * file, ull line)
-{
-	check_ast_err(ast, 1);
-	return ast->data->source;
-}
-
-#define ast_childs(ast) (_ast_childs(ctx, ast, __FUNCTION__, __FILE__, __LINE__))
-ast_list *_ast_childs(parser_context *ctx, ast_list *ast, const char * func, const char * file, ull line)
-{
-	check_ast_err(ast, 0);
-	return ast->data->childs;
-}
-
-#define ast_next(ast) (_ast_next(ctx, ast, __FUNCTION__, __FILE__, __LINE__))
-ast_list *_ast_next(parser_context *ctx, ast_list *ast, ull func, ull file, ull line)
-{
-	check_ast_err(ast, 0);
-	return ast->next;
-}
-
-#define ast_prev(ast) (_ast_prev(ctx, ast, __FUNCTION__, __FILE__, __LINE__))
-ast_list *_ast_prev(parser_context *ctx, ast_list *ast, ull func, ull file, ull line)
-{
-	check_ast_err(ast, 0);
-	return ast->next;
-}
-
-ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list *out)
+ull   parse(parser_context *ctx, named_parser_list *parsers, const char *fmt, ast_list *out)
 {
 	parser_action 	pa;
-	parser_list		*it;
+	named_parser_list		*it;
 
 
-	if (ctx->depth > 5)
-	{
-		printf("stack error\n");
-		exit (0);
-	}
+	if (ctx->depth > max_depth)
+		parse_error(ctx, "stack error, depth exceed maximum of : %llu\n", max_depth);
 
 	if (!parsers)
-	{
-		printf("Error, cant proceed without a parser list.\n");
-		exit(0);
-	}
+		parse_error(ctx, "argument error, can not proceed without a parser list.\n");
+
+	if (fmt > ctx->end_ptr || fmt < ctx->begin_ptr)
+		parse_error(ctx, "overlapsing (grade A), one of ast parser (%s) returned an invalid length, which exceed format memory area.", it->data->name);
+
+	ctx->collumn += 1;
 
 	ull oj_line = ctx->line;
 	ull oj_collumn = ctx->collumn;
@@ -127,7 +127,7 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 	ctx->begin_ptr = fmt;
 	ctx->depth += 1;
 
-	printf("[new parsing %.5s]\n", fmt);
+	//printf("[new parsing %.5s]\n", fmt);
 
 	pa = STOP;
 
@@ -137,13 +137,8 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 		it = parsers;
 		while (it && *fmt)
 		{
-			if (fmt > ctx->end_ptr || fmt < ctx->begin_ptr)
-			{
-				printf("Overlapping detected for fmt !! [%s] [%llu]\n", fmt - 3, ctx->depth);
-				exit(0);
-			}
-
-			pa = it->data(ctx, fmt, out);
+			ctx->parser_name = it->data->name;
+			pa = it->data->f(ctx, fmt, out);
 
 			if (pa == STOP)
 			{
@@ -168,6 +163,9 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 			}
 			it = it->next;
 		}
+		if (fmt > ctx->end_ptr || fmt < ctx->begin_ptr)
+			parse_error(ctx, "overlapsing (grade B), one of ast parser (%s) returned an invalid length, which exceed format memory area.", it->data->name);
+
 		/*
 		if (pa == STOP && !fmt[1] && depth > 1)
 		{
@@ -182,10 +180,8 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 			break;
 		}
 		if (pa && !it)
-		{
-			printf("Parse error in file  %s:%llu:%llu [%.8s...] with depth=%llu\n", ctx->file_name, ctx->line, ctx->collumn, fmt, ctx->depth);
-			exit (0);
-		}
+			parse_error(ctx, "unknow syntax [%.7s...].", fmt);
+
 	}
 
 /*
@@ -193,23 +189,20 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 	{
 		printf("Error, opened tag\n");
 		exit(0);
-	}*/
+	}
+*/
 
-
-/*
 	if (!*fmt && oj_depth)
-	{
-		printf("Error, opened tags\n");
-		exit(0);
-	}*/
+		parse_error(ctx, "opened pair.");
 
 	ull new_len = fmt - begi_fmt_ptr;
 	ctx->depth -= 1;
 	ctx->collumn = oj_collumn;
 	ctx->line = oj_line;
 
-	printf("\n\nPARSED [depth=%llu] :: [%.*s]\n\n", ctx->depth, new_len, fmt - new_len);
+	printf("PARSED [depth=%llu] :: [%.*s]\n", ctx->depth, (int)new_len, fmt - new_len);
 
+	ctx->collumn -= 1;
 
 	return (new_len);
 }

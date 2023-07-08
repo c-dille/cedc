@@ -1,0 +1,30 @@
+preprocess
+{
+	ast_register ...
+
+	compiler register ... w/ lambda
+}
+
+preprocess
+{
+	if (platform == .. )
+		_( ... )
+	else
+		_(...)
+}
+
+preprocess
+{
+	const int DEBUG = 0;
+}
+
+preprocess
+{
+	// will also load ast ext within an include file
+	#include "...."
+}
+
+int main()
+{
+	printf("%i\n", preprocess { _(42); });
+}

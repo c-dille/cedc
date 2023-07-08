@@ -1,6 +1,6 @@
 #include "parser.h"
 
-parser_list	*parsers = 0;
+named_parser_list	*parsers = 0;
 
 const char
 	*IDENTIFIER = "IDENTIFIER",
@@ -48,9 +48,11 @@ parser_action   quote(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '\'')
 	{
-		char *lastunescaped = findlastunescaped(fmt, '\'');
+		char *lastunescaped = findlastunescaped(fmt + 1, '\'');
+		if (!lastunescaped)
+			parse_error(ctx, "unclosed simple quote.");
 		ast_push(ast, QUOTE, strndup(fmt + 1, lastunescaped - fmt - 1));
-		return lastunescaped - fmt + 2;
+		return lastunescaped - fmt + 2;// + 500;
 	}
 	return NEXT_SYNTAX;
 }
@@ -59,7 +61,9 @@ parser_action   dquote(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '"')
 	{
-		char *lastunescaped = findlastunescaped(fmt, '"');
+		char *lastunescaped = findlastunescaped(fmt + 1, '"');
+		if (!lastunescaped)
+			parse_error(ctx, "unclosed double quotes.");
 		ast_push(ast, DQUOTE, strndup(fmt + 1, lastunescaped - fmt - 1));
 		return lastunescaped - fmt + 2;
 	}
@@ -72,9 +76,7 @@ parser_action   comment(parser_context *ctx, const char *fmt, ast_list *ast)
 	{
 		ull len = 0;
 		while (fmt && fmt[len] != '\n')
-		{
 			len   += 1;
-		}
 		return len;
 	}
 	return NEXT_SYNTAX;
@@ -86,14 +88,9 @@ parser_action   mlcomment(parser_context *ctx, const char *fmt, ast_list *ast)
 	{
 		ull len = 0;
 		while (fmt[len] && !(fmt[len] == '*' && fmt[len + 1] == '/'))
-		{
 			len   += 1;
-		}
 		if (!fmt[len])
-		{
-			printf("UNCLOSED MLCOMMENT\n");
-			exit(0);
-		}
+			parse_error(ctx, "unclosed mlcomment.");
 		return len + 1;
 	}
 	return NEXT_SYNTAX;
@@ -143,10 +140,7 @@ parser_action   endbrace(parser_context *ctx, const char *fmt, ast_list *ast)
 	if (*fmt == '}')
 	{
 		if (ast_type(ast_parent(ast)) != BRACE)
-		{
-			printf("Error, unexpected closing brace.\n");
-			exit(0);
-		}
+			parse_error(ctx, "unexpected closing brace.");
 		return STOP;
 	}
 	return NEXT_SYNTAX;
@@ -156,11 +150,8 @@ parser_action   endparenthesis(parser_context *ctx, const char *fmt, ast_list *a
 {
 	if (*fmt == ')')
 	{
-		if (!ast->data->parent || ast->data->parent->data->type != PARENTHESIS)
-		{
-			printf("Error, unexpected closing parenthesis.\n");
-			exit(0);
-		}
+		if (ast_type(ast_parent(ast)) != PARENTHESIS)
+			parse_error(ctx, "unexpected closing parenthesis.");
 		return STOP;
 	}
 	return NEXT_SYNTAX;
@@ -170,59 +161,56 @@ parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == ']')
 	{
-		if (!ast->data->parent || ast->data->parent->data->type != BRACKET)
-		{
-			printf("Error, unexpected closing bracket.\n");
-			exit(0);
-		}
+		if (ast_type(ast_parent(ast)) != BRACKET)
+			parse_error(ctx, "unexpected closing bracket.");
 		return STOP;
 	}
 	return NEXT_SYNTAX;
 }
 
+
+
 int main()
 {
-	parser_list_add(&parsers, comment);
-	parser_list_add(&parsers, mlcomment);
+	named_parser_list_add(&parsers, alloc_named_parser(comment));
+	named_parser_list_add(&parsers, alloc_named_parser(mlcomment));
 
-	parser_list_add(&parsers, space);
-	parser_list_add(&parsers, identifier);
-	parser_list_add(&parsers, operator);
-	parser_list_add(&parsers, quote);
-	parser_list_add(&parsers, dquote);
+	named_parser_list_add(&parsers, alloc_named_parser(space));
+	named_parser_list_add(&parsers, alloc_named_parser(identifier));
+	named_parser_list_add(&parsers, alloc_named_parser(operator));
 
-	parser_list_add(&parsers, brace);
-	parser_list_add(&parsers, parenthesis);
-	parser_list_add(&parsers, bracket);
+	named_parser_list_add(&parsers, alloc_named_parser(quote));
+	named_parser_list_add(&parsers, alloc_named_parser(dquote));
 
+	named_parser_list_add(&parsers, alloc_named_parser(brace));
+	named_parser_list_add(&parsers, alloc_named_parser(parenthesis));
+	named_parser_list_add(&parsers, alloc_named_parser(bracket));
 
+	named_parser_list_add(&parsers, alloc_named_parser(endbrace));
+	named_parser_list_add(&parsers, alloc_named_parser(endparenthesis));
+	named_parser_list_add(&parsers, alloc_named_parser(endbracket));
 
-	parser_list_add(&parsers, endbrace);
-	parser_list_add(&parsers, endparenthesis);
-	parser_list_add(&parsers, endbracket);
-
-    const char *fmt = "  {{{  \"stri\\\"ng\" hiii }}}  /**/   ";
+    const char *fmt = "{{{ \"fedsefs\\\"dde\" hiiii }}}  /**/   ";
 	ast_list	*ast = ast_list_root(0);
 	parser_context ctx = (parser_context){
-		.file_name = "<text>",
+		.file_path = "<text>",
 		.line = 1,
-		.collumn = 1,
+		.collumn = 0,
 		.depth = 0,
 		.begin_ptr = fmt,
-		.end_ptr = fmt + strlen(fmt)
+		.end_ptr = fmt + strlen(fmt),
+		.parser_name = ""
 	};
 
 	if (!parse(&ctx, parsers, fmt, ast))
 		return 1;
 
-    printf("AST type: %s\n", ast->next->data->type);
-    printf("AST value: %s\n", ast->next->data->source);
-	printf("AST STRING TYPE : %s\n", ast->next->data->childs->next->data->childs->next->data->childs->next->data->type);
-	printf("AST STRING SOURCE : %s\n", ast->next->data->childs->next->data->childs->next->data->childs->next->data->source);
-
-	printf("AST ID TYPE : %s\n", ast->next->data->childs->next->data->childs->next->data->childs->next->next->data->source);
-
-	printf("AST ID SOURCE : %s\n", ast->next->data->childs->next->data->childs->next->data->childs->next->next->data->source);
+    printf("AST type: %s\n", ast_type(ast_next(ast)));
+    printf("AST value: %s\n",  ast_source(ast_next(ast)));
+	printf("AST STRING TYPE : %s\n", ast_type(ast_next(ast_childs(ast_next(ast_childs(ast_next(ast_childs(ast_next(ast)))))))));
+	printf("AST STRING SOURCE : %s\n", ast_source(ast_next(ast_childs(ast_next(ast_childs(ast_next(ast_childs(ast_next(ast)))))))));
+	printf("AST ID TYPE : %s\n", ast_type(ast_next(ast_next(ast_childs(ast_next(ast_childs(ast_next(ast_childs(ast_next(ast))))))))));
+	printf("AST ID SOURCE : %s\n", ast_source(ast_next(ast_next(ast_childs(ast_next(ast_childs(ast_next(ast_childs(ast_next(ast))))))))));
 
 
     return 0;
