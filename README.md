@@ -2,6 +2,9 @@
 
 ## TODO
 
+- [ ] restructre project
+- [ ] add klist to void*, free, type? as compiler contexts objets for IE #define etc...
+
 *PARSER*
 
 - [x] reccursive engine
