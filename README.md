@@ -20,7 +20,7 @@
 - [x]  fix overlapping issues check
 - [x] better debug with line / col pos
 - [ ] function to parse a file directly
-- [ ] free function
+- [x] free function
 - [ ] dump ast function
 - [x] string begin / end ptr check ?? function to access more easily the parents / childs while checking error
 - [x] remove weird stuffs around ast primitves for debuggin g -> remove ctx, add a debug for ctx and an other for __FILE__
@@ -28,11 +28,13 @@
 - [x] create a list wrapper for named items (use klist from previous cedilla versions)
 
 *COMPILER*
+- [ ] determine logic, way to parse and compile at same time for single file pass ?
 - [ ] ast macro engine
 - [ ] emit #line for gcc
 
 1) pa parser(const char *, ast) +  ast macro(ast) + char *compiler(ast)
 2) only pa parser(const char *, ast) + char*compiler(ast)
+
 
 issue: macro that requires a longer parsing phase than a firstly defined compiler
 solution: ?

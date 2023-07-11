@@ -53,7 +53,7 @@ void ast_error(const char *msg, const char *file, int line, const char *func) {
 typedef parser_action(*parser)(parser_context *ctx, const char *fmt, ast_list *ast);
 
 DEF_KLIST_PROTO(parser, parser_list);
-DEF_KLIST(parser, parser_list, 0);
+DEF_KLIST(parser, parser_list, free);
 
 
 ast_list *ast_list_root(ast_list *root)
@@ -65,7 +65,7 @@ ast_list *ast_list_root(ast_list *root)
 	));
 }
 
-ast_list *ast_push(ast_list *ast, const char *type, const char *source)
+ast_list *ast_push(ast_list *ast, const char *type, char *source)
 {
 	ast_list *l = ast_list_add(&ast, ALLOC(ast_node,
 		.type = type,

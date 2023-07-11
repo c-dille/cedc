@@ -103,7 +103,7 @@ parser_action   brace(parser_context *ctx, const char *fmt, ast_list *ast)
 		return
 			2 +
 			parse(ctx, parsers, fmt + 1,
-				ast_push(ast, BRACE, "{}")->data->childs
+				ast_push(ast, BRACE, strdup("{}"))->data->childs
 			);
 	}
 	return NEXT_SYNTAX;
@@ -116,7 +116,7 @@ parser_action   parenthesis(parser_context *ctx, const char *fmt, ast_list *ast)
 		return
 			2 +
 			parse(ctx, parsers, fmt + 1,
-				ast_push(ast, PARENTHESIS, "()")->data->childs
+				ast_push(ast, PARENTHESIS, strdup("()"))->data->childs
 			);
 	}
 	return NEXT_SYNTAX;
@@ -129,7 +129,7 @@ parser_action   bracket(parser_context *ctx, const char *fmt, ast_list *ast)
 		return
 			2 +
 			parse(ctx, parsers, fmt + 1,
-				ast_push(ast, BRACKET, "[]")->data->childs
+				ast_push(ast, BRACKET, strdup("[]"))->data->childs
 			);
 	}
 	return NEXT_SYNTAX;
@@ -172,20 +172,15 @@ parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
 int main()
 {
 	parser_list_set(&parsers, KV(comment));
-
 	parser_list_set(&parsers, KV(mlcomment));
-
 	parser_list_set(&parsers, KV(space));
 	parser_list_set(&parsers, KV(identifier));
 	parser_list_set(&parsers, KV(operator));
-
 	parser_list_set(&parsers, KV(quote));
 	parser_list_set(&parsers, KV(dquote));
-
 	parser_list_set(&parsers, KV(brace));
 	parser_list_set(&parsers, KV(parenthesis));
 	parser_list_set(&parsers, KV(bracket));
-
 	parser_list_set(&parsers, KV(endbrace));
 	parser_list_set(&parsers, KV(endparenthesis));
 	parser_list_set(&parsers, KV(endbracket));
@@ -213,6 +208,9 @@ int main()
 	printf("AST ID SOURCE : %s\n", ast_source(ast_next(ast_next(ast_childs(ast_next(ast_childs(ast_next(ast_childs(ast_next(ast))))))))));
 
 	//ast_get(ast, next, type)
+
+	ast_list_free(ast);
+	parser_list_free(parsers);
 
     return 0;
 }
