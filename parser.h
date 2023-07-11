@@ -19,7 +19,11 @@ typedef struct
 	const char 	*begin_ptr;
 	const char	*end_ptr;
 	const char 	*parser_name;
-}	parser_context;
+	// preprocess() function on the AST
+	// parser_list
+	// macro_list
+	// compiler_list
+}	parser_context;	// rename to cedilla_context ?
 
 
 void parse_info(parser_context *ctx, const char *msg, ...) {
