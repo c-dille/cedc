@@ -25,7 +25,7 @@
 - [x] string begin / end ptr check ?? function to access more easily the parents / childs while checking error
 - [x] remove weird stuffs around ast primitves for debuggin g -> remove ctx, add a debug for ctx and an other for __FILE__
 - [x] overlapping etc.. also specify macro name ? ORR maro that om ast syntax exec would populate ctx
-- [ ] create a list wrapper for named items (use klist from previous cedilla versions)
+- [x] create a list wrapper for named items (use klist from previous cedilla versions)
 
 *COMPILER*
 - [ ] ast macro engine

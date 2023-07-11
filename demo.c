@@ -1,6 +1,6 @@
 #include "parser.h"
 
-named_parser_list	*parsers = 0;
+parser_list	*parsers = 0;
 
 const char
 	*IDENTIFIER = "IDENTIFIER",
@@ -169,26 +169,26 @@ parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
 }
 
 
-
 int main()
 {
-	named_parser_list_add(&parsers, alloc_named_parser(comment));
-	named_parser_list_add(&parsers, alloc_named_parser(mlcomment));
+	parser_list_set(&parsers, KV(comment));
 
-	named_parser_list_add(&parsers, alloc_named_parser(space));
-	named_parser_list_add(&parsers, alloc_named_parser(identifier));
-	named_parser_list_add(&parsers, alloc_named_parser(operator));
+	parser_list_set(&parsers, KV(mlcomment));
 
-	named_parser_list_add(&parsers, alloc_named_parser(quote));
-	named_parser_list_add(&parsers, alloc_named_parser(dquote));
+	parser_list_set(&parsers, KV(space));
+	parser_list_set(&parsers, KV(identifier));
+	parser_list_set(&parsers, KV(operator));
 
-	named_parser_list_add(&parsers, alloc_named_parser(brace));
-	named_parser_list_add(&parsers, alloc_named_parser(parenthesis));
-	named_parser_list_add(&parsers, alloc_named_parser(bracket));
+	parser_list_set(&parsers, KV(quote));
+	parser_list_set(&parsers, KV(dquote));
 
-	named_parser_list_add(&parsers, alloc_named_parser(endbrace));
-	named_parser_list_add(&parsers, alloc_named_parser(endparenthesis));
-	named_parser_list_add(&parsers, alloc_named_parser(endbracket));
+	parser_list_set(&parsers, KV(brace));
+	parser_list_set(&parsers, KV(parenthesis));
+	parser_list_set(&parsers, KV(bracket));
+
+	parser_list_set(&parsers, KV(endbrace));
+	parser_list_set(&parsers, KV(endparenthesis));
+	parser_list_set(&parsers, KV(endbracket));
 
     const char *fmt = "{{{ \"fedsefs\\\"dde\" hiiii }}}  /**/   ";
 	ast_list	*ast = ast_list_root(0);
