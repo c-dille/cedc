@@ -1,6 +1,6 @@
 #ifndef AST_MACRO_H
 # define AST_MACRO_H
-# include "tools.h"
+# include "ft.h"
 
 typedef struct s_ast_node ast_node;
 DEF_LIST_PROTO(ast_node*, ast_list);

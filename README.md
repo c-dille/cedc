@@ -2,8 +2,8 @@
 
 ## TODO
 
-- [ ] restructre project
-- [ ] add klist to void*, free, type? as compiler contexts objets for IE #define etc...
+- [x] restructre project
+- [ ] add klist to void*, free, type? as parser context objets for IE #define etc...
 
 *PARSER*
 
@@ -31,7 +31,7 @@
 - [x] create a list wrapper for named items (use klist from previous cedilla versions)
 
 *COMPILER*
-- [ ] determine logic, way to parse and compile at same time for single file pass ?
+- [x] determine logic, way to parse and compile at same time for single file pass ?
 - [ ] ast macro engine
 - [ ] emit #line for gcc
 

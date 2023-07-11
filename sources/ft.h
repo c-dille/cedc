@@ -19,6 +19,7 @@
 	*o = (TYPE) {__VA_ARGS__};				    \
 	o;										    \
 })
+#define DEF(X) const char *X = #X;
 #define print(...) 								\
 	(fprintf(stderr, "[%s:%i]\t", __FILE__, __LINE__)\
 + 												\

@@ -96,10 +96,10 @@ preprocess
 
 -----------------------------------
 
-1) pa parser(const char *, ast) +  ast macro(ast) + char *compiler(ast)
+1) pa parser(const char *, ast) +  ast macro(ast) + char *compiler(ast) <------------
 	+ more efficient
 	- less easy ??
-	- macro would require user-level tree dissection
+	- macro would require user-level tree dissection ???
 
 
 or
@@ -108,10 +108,5 @@ or
 
 	+ easier for mind ???
 	- less efficient
-
-
-?
-
-if only parsers and compiler then things would be same... i.e compile -> parse -> compile ... and stop when result is same ?
 
 

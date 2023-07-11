@@ -1,15 +1,12 @@
-#include "parser.h"
+#include "sources/parser.h"
 
-parser_list	*parsers = 0;
-
-const char
-	*IDENTIFIER = "IDENTIFIER",
-	*OPERATOR = "OPERATOR",
-	*QUOTE = "DQUOTE",
-	*DQUOTE = "DQUOTE",
-	*BRACE = "BRACE",
-	*PARENTHESIS = "PARENTHESIS",
-	*BRACKET = "BRACKET";
+DEF(IDENTIFIER)
+DEF(OPERATOR)
+DEF(QUOTE)
+DEF(DQUOTE)
+DEF(BRACE)
+DEF(PARENTHESIS)
+DEF(BRACKET)
 
 parser_action   space(parser_context *ctx, const char *fmt, ast_list *ast)
 {
@@ -101,8 +98,7 @@ parser_action   brace(parser_context *ctx, const char *fmt, ast_list *ast)
 	if (*fmt == '{')
 	{
 		return
-			2 +
-			parse(ctx, parsers, fmt + 1,
+			2 + parse(ctx, fmt + 1,
 				ast_push(ast, BRACE, strdup("{}"))->data->childs
 			);
 	}
@@ -115,7 +111,7 @@ parser_action   parenthesis(parser_context *ctx, const char *fmt, ast_list *ast)
 	{
 		return
 			2 +
-			parse(ctx, parsers, fmt + 1,
+			parse(ctx, fmt + 1,
 				ast_push(ast, PARENTHESIS, strdup("()"))->data->childs
 			);
 	}
@@ -128,7 +124,7 @@ parser_action   bracket(parser_context *ctx, const char *fmt, ast_list *ast)
 	{
 		return
 			2 +
-			parse(ctx, parsers, fmt + 1,
+			parse(ctx, fmt + 1,
 				ast_push(ast, BRACKET, strdup("[]"))->data->childs
 			);
 	}
@@ -168,9 +164,12 @@ parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
+#include "sources/preprocessor.h"
 
 int main()
 {
+	parser_list	*parsers = 0;
+
 	parser_list_set(&parsers, KV(comment));
 	parser_list_set(&parsers, KV(mlcomment));
 	parser_list_set(&parsers, KV(space));
@@ -194,10 +193,12 @@ int main()
 		.depth = 0,
 		.begin_ptr = fmt,
 		.end_ptr = fmt + strlen(fmt),
-		.parser_name = ""
+		.parser_name = "",
+		.parsers = parsers,
+		.preprocess = preprocess
 	};
 
-	if (!parse(&ctx, parsers, fmt, ast))
+	if (!parse(&ctx, fmt, ast))
 		return 1;
 
     printf("AST type: %s\n", ast_type(ast_next(ast)));

@@ -10,7 +10,14 @@ typedef enum
     NEXT_CHAR = 1,
 }   parser_action;
 
-typedef struct
+typedef struct s_parser_context parser_context;
+
+typedef parser_action(*parser)(parser_context *ctx, const char *fmt, ast_list *ast);
+
+DEF_KLIST_PROTO(parser, parser_list);
+DEF_KLIST(parser, parser_list, free);
+
+struct s_parser_context
 {
 	ull			collumn; // only used for parse error, rest may feeded to gcc #line
 	ull			line;
@@ -19,11 +26,13 @@ typedef struct
 	const char 	*begin_ptr;
 	const char	*end_ptr;
 	const char 	*parser_name;
+	parser_list	*parsers;
+	bool 	(*preprocess)(parser_context*, ast_list *);
+
 	// preprocess() function on the AST
-	// parser_list
 	// macro_list
 	// compiler_list
-}	parser_context;	// rename to cedilla_context ?
+};
 
 
 void parse_info(parser_context *ctx, const char *msg, ...) {
@@ -54,10 +63,6 @@ void ast_error(const char *msg, const char *file, int line, const char *func) {
 	exit(0);
 }
 
-typedef parser_action(*parser)(parser_context *ctx, const char *fmt, ast_list *ast);
-
-DEF_KLIST_PROTO(parser, parser_list);
-DEF_KLIST(parser, parser_list, free);
 
 
 ast_list *ast_list_root(ast_list *root)
@@ -80,7 +85,7 @@ ast_list *ast_push(ast_list *ast, const char *type, char *source)
 	return l;
 }
 
-int check_ast_deref(ast_list *ast, int check_data, const char *file, int line, const char *func)
+int ast_check_deref(ast_list *ast, int check_data, const char *file, int line, const char *func)
 {
 	if (!ast)
 		ast_error("Trying to access parent from a null ast ptr.", file, line, func);
@@ -89,23 +94,23 @@ int check_ast_deref(ast_list *ast, int check_data, const char *file, int line, c
 	return 0;
 }
 
-#define ast_parent(ast)	(check_ast_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->parent)
-#define ast_type(ast) 	(check_ast_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->type)
-#define ast_source(ast) (check_ast_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->source)
-#define ast_childs(ast) (check_ast_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->childs)
-#define ast_next(ast) (check_ast_deref(ast, 0, __FILE__, __LINE__, __FUNCTION__) + ast->next)
-#define ast_prev(ast) (check_ast_deref(ast, 0, __FILE__, __LINE__, __FUNCTION__) + ast->prev)
+#define ast_parent(ast)	(ast_check_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->parent)
+#define ast_type(ast) 	(ast_check_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->type)
+#define ast_source(ast) (ast_check_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->source)
+#define ast_childs(ast) (ast_check_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->childs)
+#define ast_next(ast) (ast_check_deref(ast, 0, __FILE__, __LINE__, __FUNCTION__) + ast->next)
+#define ast_prev(ast) (ast_check_deref(ast, 0, __FILE__, __LINE__, __FUNCTION__) + ast->prev)
 
 const ull max_depth = 7;
 
-ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list *out)
+ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 {
 	parser_action 	pa;
 	parser_list		*it;
 
 	if (ctx->depth > max_depth)
 		parse_error(ctx, "stack error, depth exceed maximum of : %llu\n", max_depth);
-	if (!parsers)
+	if (!ctx->parsers)
 		parse_error(ctx, "argument error, can not proceed without a parser list.\n");
 	if (fmt > ctx->end_ptr || fmt < ctx->begin_ptr)
 		parse_error(ctx, "overlapsing (grade A), one of ast parser (%s) returned an invalid length, which exceed format memory area.", it->data->key);
@@ -120,11 +125,12 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 	while (*fmt)
 	{
 		pa = STOP;
-		it = parsers;
+		it = ctx->parsers;
 		while (it && *fmt)
 		{
 			ctx->parser_name = it->data->key;
 			pa = it->data->value(ctx, fmt, out);
+			ctx->preprocess(ctx, out);
 			if (pa == STOP)
 				break;
 			else if (pa == NEXT_SYNTAX)
@@ -161,6 +167,15 @@ ull   parse(parser_context *ctx, parser_list *parsers, const char *fmt, ast_list
 	ctx->collumn -= 1;
 	return (new_len);
 }
+
+ull   parse_file(parser_context *ctx, parser_list *parsers, const char *path, ast_list *out)
+{
+	char	*src = read_file(path);
+	ull len = parse(ctx, src, out);
+	free(src);
+	return len;
+}
+
 
 #endif
 
