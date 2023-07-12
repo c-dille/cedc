@@ -34,13 +34,11 @@ void ast_dump_helper(ast_list *l, int depth)
 	printf("ast_list_vnew(\n");
 	while (l)
 	{
-		printf("%*s(ast_node) {\n", (depth + 1) * 4, "");  // Padding based on depth
-			printf("%*s.type = \"%s\",\n", (depth + 2) * 4, "", l->data->type);  // Padding based on depth + 1
-			printf("%*s.source = \"%s\",\n", (depth + 2) * 4, "", l->data->source);  // Padding based on depth + 1
-
-			printf("%*s.childs = ", (depth + 2) * 4, "");
-			ast_dump_helper(l->data->childs, depth + 2);  // Recursively call ast_dump_helper with increased depth
-
+		printf("%*s(ast_node) {\n", (depth + 1) * 4, "");
+		printf("%*s.type = \"%s\",\n", (depth + 2) * 4, "", l->data->type);
+		printf("%*s.source = \"%s\",\n", (depth + 2) * 4, "", l->data->source);
+		printf("%*s.childs = ", (depth + 2) * 4, "");
+		ast_dump_helper(l->data->childs, depth + 2);
 		printf("%*s}", (depth + 1) * 4, "");
 		if (l->next)
 			printf(",");
