@@ -22,4 +22,45 @@ void ast_free_node(ast_node *node)
 	free(node);
 }
 
+void ast_dump_helper(ast_list *l, int depth)
+{
+	ast_list *it = l;
+
+	if (!l)
+	{
+		printf("ast_list_root(0)\n");
+		return ;
+	}
+	printf("ast_list_vnew(\n");
+	while (l)
+	{
+		printf("%*s(ast_node) {\n", (depth + 1) * 4, "");  // Padding based on depth
+			printf("%*s.type = \"%s\",\n", (depth + 2) * 4, "", l->data->type);  // Padding based on depth + 1
+			printf("%*s.source = \"%s\",\n", (depth + 2) * 4, "", l->data->source);  // Padding based on depth + 1
+
+			printf("%*s.childs = ", (depth + 2) * 4, "");
+			ast_dump_helper(l->data->childs, depth + 2);  // Recursively call ast_dump_helper with increased depth
+
+		printf("%*s}", (depth + 1) * 4, "");
+		if (l->next)
+			printf(",");
+		printf("\n");
+		l = l->next;
+	}
+	printf("%*s)\n", (depth) * 4, "");
+}
+
+ast_list *ast_list_vnew(ast_node first, ...)
+{
+	ast_list	*r;
+
+
+	return (r);
+}
+
+void ast_dump(ast_list *l)
+{
+	ast_dump_helper(l, 0);
+}
+
 #endif
