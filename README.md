@@ -6,6 +6,7 @@
 - [x] add klist to void*, free, type? as parser context objets for IE #define etc... + add a clone function
 - [x] klist : add an exists function, and allow non pointers type
 - [x] determine logic, way to parse and compile at same time for single file pass ?
+- [ ] abstraction preprocessor FOR_EACH(...) and COUNT_ARGS(...) with a PHP or BASH defined state-machine
 
 *PARSER*
 
