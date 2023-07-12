@@ -91,7 +91,7 @@ parser_action   mlcomment(parser_context *ctx, const char *fmt, ast_list *ast)
 			len   += 1;
 		if (!fmt[len])
 			parse_error(ctx, "unclosed mlcomment.");
-		return len + 1;
+		return len + 2;
 	}
 	return NEXT_SYNTAX;
 }
@@ -237,78 +237,67 @@ int main()
 
 	// TEST DUMP OUTPUT :
 	__auto_type l = ast_list_vnew(
-    (ast_node) {
-        .type = "ROOT",
-        .source = "(null)",
-        .childs = ast_list_root(0)
-    },
-    (ast_node) {
-        .type = "BRACE",
-        .source = "{}",
-        .childs = ast_list_vnew(
-            (ast_node) {
-                .type = "ROOT",
-                .source = "(null)",
-                .childs = ast_list_root(0)
-            },
-            (ast_node) {
-                .type = "BRACE",
-                .source = "{}",
-                .childs = ast_list_vnew(
-                    (ast_node) {
-                        .type = "ROOT",
-                        .source = "(null)",
-                        .childs = ast_list_root(0)
-                    },
-                    (ast_node) {
-                        .type = "BRACE",
-                        .source = "{}",
-                        .childs = ast_list_vnew(
-                            (ast_node) {
-                                .type = "ROOT",
-                                .source = "(null)",
-                                .childs = ast_list_root(0)
-                            },
-                            (ast_node) {
-                                .type = "DQUOTE",
-                                .source = "fedsefs\"dde",
-                                .childs = ast_list_vnew(
-                                    (ast_node) {
-                                        .type = "ROOT",
-                                        .source = "(null)",
-                                        .childs = ast_list_root(0)
-                                    }
-                                )
-                            },
-                            (ast_node) {
-                                .type = "IDENTIFIER",
-                                .source = "hiiii",
-                                .childs = ast_list_vnew(
-                                    (ast_node) {
-                                        .type = "ROOT",
-                                        .source = "(null)",
-                                        .childs = ast_list_root(0)
-                                    }
-                                )
-                            }
-                        )
-                    }
-                )
-            }
-        )
-    },
-    (ast_node) {
-        .type = "OPERATOR",
-        .source = "/",
-        .childs = ast_list_vnew(
-            (ast_node) {
-                .type = "ROOT",
-                .source = "(null)",
-                .childs = ast_list_root(0)
-            }
-        )
-    }
-);
+		(ast_node) {
+			.type = "ROOT",
+			.source = "(null)",
+			.childs = 0
+		},
+		(ast_node) {
+			.type = "BRACE",
+			.source = "{}",
+			.childs = ast_list_vnew(
+				(ast_node) {
+					.type = "ROOT",
+					.source = "(null)",
+					.childs = 0
+				},
+				(ast_node) {
+					.type = "BRACE",
+					.source = "{}",
+					.childs = ast_list_vnew(
+						(ast_node) {
+							.type = "ROOT",
+							.source = "(null)",
+							.childs = 0
+						},
+						(ast_node) {
+							.type = "BRACE",
+							.source = "{}",
+							.childs = ast_list_vnew(
+								(ast_node) {
+									.type = "ROOT",
+									.source = "(null)",
+									.childs = 0
+								},
+								(ast_node) {
+									.type = "DQUOTE",
+									.source = "fedsefs\"dde",
+									.childs = ast_list_vnew(
+										(ast_node) {
+											.type = "ROOT",
+											.source = "(null)",
+											.childs = 0
+										}
+									)
+								},
+								(ast_node) {
+									.type = "IDENTIFIER",
+									.source = "hiiii",
+									.childs = ast_list_vnew(
+										(ast_node) {
+											.type = "ROOT",
+											.source = "(null)",
+											.childs = 0
+										}
+									)
+								}
+							)
+						}
+					)
+				}
+			)
+		}
+	);
 
     return 0;
 }

@@ -28,7 +28,7 @@ void ast_dump_helper(ast_list *l, int depth)
 
 	if (!l)
 	{
-		printf("ast_list_root(0)\n");
+		printf("0\n");
 		return ;
 	}
 	printf("ast_list_vnew(\n");
