@@ -10,8 +10,11 @@ DEF(BRACKET)
 
 parser_action   space(parser_context *ctx, const char *fmt, ast_list *ast)
 {
+	if (*fmt == '\n')
+		return PARSE_NEW_LINE;
 	if (isspace(*fmt))
-		return NEXT_CHAR;
+		return PARSE_NEXT_CHAR;
+
 	return NEXT_SYNTAX;
 }
 
@@ -137,7 +140,7 @@ parser_action   endbrace(parser_context *ctx, const char *fmt, ast_list *ast)
 	{
 		if (ast_type(ast_parent(ast)) != BRACE)
 			parse_error(ctx, "unexpected closing brace.");
-		return STOP;
+		return STOP_PARSER;
 	}
 	return NEXT_SYNTAX;
 }
@@ -148,7 +151,7 @@ parser_action   endparenthesis(parser_context *ctx, const char *fmt, ast_list *a
 	{
 		if (ast_type(ast_parent(ast)) != PARENTHESIS)
 			parse_error(ctx, "unexpected closing parenthesis.");
-		return STOP;
+		return STOP_PARSER;
 	}
 	return NEXT_SYNTAX;
 }
@@ -159,12 +162,16 @@ parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
 	{
 		if (ast_type(ast_parent(ast)) != BRACKET)
 			parse_error(ctx, "unexpected closing bracket.");
-		return STOP;
+		return STOP_PARSER;
 	}
 	return NEXT_SYNTAX;
 }
 
-#include "sources/preprocessor.h"
+preprocessor_action	test(parser_context *ctx, ast_list *l)
+{
+	printf(".");
+	return (STOP_PREPROCESSOR);
+}
 
 int main()
 {
@@ -184,6 +191,10 @@ int main()
 	parser_list_set(&parsers, KV(endparenthesis));
 	parser_list_set(&parsers, KV(endbracket));
 
+	macro_list *macros = 0;
+
+	macro_list_set(&macros, KV(test));
+
     const char *fmt = "{{{ \"fedsefs\\\"dde\" hiiii }}}  /**/   ";
 	ast_list	*ast = ast_list_root(0);
 	parser_context ctx = (parser_context){
@@ -195,11 +206,17 @@ int main()
 		.end_ptr = fmt + strlen(fmt),
 		.parser_name = "",
 		.parsers = parsers,
-		.preprocess = preprocess
+		.preprocess = preprocess,
+		.objects = 0,
+		.macros = macros
 	};
+
+	object_list_set(&ctx.objects, "test", (object){.ptr="test",.free=0, .clone=0});
 
 	if (!parse(&ctx, fmt, ast))
 		return 1;
+
+	object_list_free(ctx.objects);
 
     printf("AST type: %s\n", ast_type(ast_next(ast)));
     printf("AST value: %s\n",  ast_source(ast_next(ast)));

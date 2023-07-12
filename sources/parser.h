@@ -5,17 +5,20 @@
 typedef enum
 {
     NEXT_SYNTAX = -2,
-	NEW_LINE = -1,
-    STOP = 0,
-    NEXT_CHAR = 1,
+	PARSE_NEW_LINE = -1,
+    STOP_PARSER = 0,
+    PARSE_NEXT_CHAR = 1,
 }   parser_action;
-
 typedef struct s_parser_context parser_context;
-
 typedef parser_action(*parser)(parser_context *ctx, const char *fmt, ast_list *ast);
-
 DEF_KLIST_PROTO(parser, parser_list);
 DEF_KLIST(parser, parser_list, free);
+
+void parse_info(parser_context *ctx, const char *msg, ...);
+void parse_error(parser_context *ctx, const char *msg, ...);
+
+typedef struct s_macro_list macro_list;
+typedef struct s_object_list object_list;
 
 struct s_parser_context
 {
@@ -28,12 +31,14 @@ struct s_parser_context
 	const char 	*parser_name;
 	parser_list	*parsers;
 	bool 	(*preprocess)(parser_context*, ast_list *);
-
+	object_list	*objects;
+	macro_list	*macros;
 	// preprocess() function on the AST
 	// macro_list
 	// compiler_list
 };
 
+#include "preprocessor.h"
 
 void parse_info(parser_context *ctx, const char *msg, ...) {
 	va_list	ap;
@@ -121,21 +126,21 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 	const char *begi_fmt_ptr = fmt;
 	ctx->begin_ptr = fmt;
 	ctx->depth += 1;
-	pa = STOP;
+	pa = STOP_PARSER;
 	while (*fmt)
 	{
-		pa = STOP;
+		pa = STOP_PARSER;
 		it = ctx->parsers;
 		while (it && *fmt)
 		{
 			ctx->parser_name = it->data->key;
 			pa = it->data->value(ctx, fmt, out);
 			ctx->preprocess(ctx, out);
-			if (pa == STOP)
+			if (pa == STOP_PARSER)
 				break;
 			else if (pa == NEXT_SYNTAX)
 				;
-			else if (pa == NEW_LINE)
+			else if (pa == PARSE_NEW_LINE)
 			{
 				fmt += 1;
 				ctx->line += 1;
@@ -152,7 +157,7 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 		}
 		if (fmt > ctx->end_ptr || fmt < ctx->begin_ptr)
 			parse_error(ctx, "overlapsing (grade B), one of ast parser (%s) returned an invalid length, which exceed format memory area.", it->data->key);
-		if (pa == STOP)
+		if (pa == STOP_PARSER)
 			break;
 		if (pa && !it)
 			parse_error(ctx, "unknow syntax [%.7s...].", fmt);

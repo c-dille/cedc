@@ -184,6 +184,19 @@ TYPE    NAME ##_get(NAME *map, const char *key);\
                                             \
 DEF_LIST(NAME##_entry*, NAME, FREEF)        \
                                             \
+int         NAME ## _isset(NAME **map, const char *key)\
+{                                           \
+    NAME    *l;                             \
+                                            \
+    l = *map;                               \
+    while (l)                               \
+    {                                       \
+        if (!strcmp(l->data->key, key))     \
+            return 1;                       \
+        l = l->next;                        \
+    }                                       \
+    return 0;                               \
+}											\
 int         NAME ## _set(NAME **map, const char *key, TYPE value)\
 {                                           \
     NAME    *l;                             \
@@ -199,7 +212,7 @@ int         NAME ## _set(NAME **map, const char *key, TYPE value)\
         l = l->next;                        \
     }                                       \
     NAME##_add(map, ALLOC(NAME ## _entry, .key=key, .value=value));\
-    return 1;                               \
+    return 0;                               \
 }                                           \
                                             \
 TYPE    NAME##_get(NAME *map, const char *key)\
@@ -212,8 +225,10 @@ TYPE    NAME##_get(NAME *map, const char *key)\
         if (!strcmp(l->data->key, key))     \
             return l->data->value;          \
         l = l->next;                        \
-    }                                       \
-    return 0;                               \
+    }										\
+	printf("Error, trying to get an unknow key %s in %s:%u\n", key, __FILE__, __LINE__);\
+	exit(0);								\
+    return l->data->value;          		\
 }
 #define KV(STR) #STR, STR
 

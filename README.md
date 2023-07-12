@@ -3,7 +3,8 @@
 ## TODO
 
 - [x] restructre project
-- [ ] add klist to void*, free, type? as parser context objets for IE #define etc...
+- [x] add klist to void*, free, type? as parser context objets for IE #define etc... + add a clone function
+- [x] klist : add an exists function, and allow non pointers type
 
 *PARSER*
 
@@ -22,7 +23,7 @@
 - [x] check memory issue
 - [x]  fix overlapping issues check
 - [x] better debug with line / col pos
-- [ ] function to parse a file directly
+- [x] function to parse a file directly
 - [x] free function
 - [ ] dump ast function
 - [x] string begin / end ptr check ?? function to access more easily the parents / childs while checking error
