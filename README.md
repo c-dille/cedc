@@ -5,6 +5,7 @@
 - [x] restructre project
 - [x] add klist to void*, free, type? as parser context objets for IE #define etc... + add a clone function
 - [x] klist : add an exists function, and allow non pointers type
+- [x] determine logic, way to parse and compile at same time for single file pass ?
 
 *PARSER*
 
@@ -31,17 +32,12 @@
 - [x] overlapping etc.. also specify macro name ? ORR maro that om ast syntax exec would populate ctx
 - [x] create a list wrapper for named items (use klist from previous cedilla versions)
 
-*COMPILER*
-- [x] determine logic, way to parse and compile at same time for single file pass ?
-- [ ] ast macro engine
+*MACROS*
+- [x] ast macro engine
 - [ ] emit #line for gcc
 
-1) pa parser(const char *, ast) +  ast macro(ast) + char *compiler(ast)
-2) only pa parser(const char *, ast) + char*compiler(ast)
-
-
-issue: macro that requires a longer parsing phase than a firstly defined compiler
-solution: ?
+*COMPILER*
+- [ ] implement compiler function
 
 *SYNTAX*
 - [ ] in-source syntax extensiohs
