@@ -102,7 +102,7 @@ parser_action   brace(parser_context *ctx, const char *fmt, ast_list *ast)
 	{
 		return
 			2 + parse(ctx, fmt + 1,
-				ast_push(ast, BRACE, strdup("{}"))->data->childs
+				ast_push(ast, BRACE, strdup("{}"))->data.childs
 			);
 	}
 	return NEXT_SYNTAX;
@@ -115,7 +115,7 @@ parser_action   parenthesis(parser_context *ctx, const char *fmt, ast_list *ast)
 		return
 			2 +
 			parse(ctx, fmt + 1,
-				ast_push(ast, PARENTHESIS, strdup("()"))->data->childs
+				ast_push(ast, PARENTHESIS, strdup("()"))->data.childs
 			);
 	}
 	return NEXT_SYNTAX;
@@ -128,7 +128,7 @@ parser_action   bracket(parser_context *ctx, const char *fmt, ast_list *ast)
 		return
 			2 +
 			parse(ctx, fmt + 1,
-				ast_push(ast, BRACKET, strdup("[]"))->data->childs
+				ast_push(ast, BRACKET, strdup("[]"))->data.childs
 			);
 	}
 	return NEXT_SYNTAX;
@@ -193,7 +193,7 @@ int main()
 
 	macro_list *macros = 0;
 
-	macro_list_set(&macros, KV(test));
+	//macro_list_set(&macros, KV(test));
 
     const char *fmt = "{{{ \"fedsefs\\\"dde\" hiiii }}}  /**/   ";
 	ast_list	*ast = ast_list_root(0);
@@ -234,59 +234,58 @@ int main()
 	ast_list_free(ast);
 	parser_list_free(parsers);
 
-
-	// TEST DUMP OUTPUT :
-	__auto_type l = ast_list_vnew(
+//	return 0;
+	__auto_type l = ast_list_vnew(2,
 		(ast_node) {
 			.type = "ROOT",
-			.source = "(null)",
+			.source = 0,
 			.childs = 0
 		},
 		(ast_node) {
 			.type = "BRACE",
-			.source = "{}",
-			.childs = ast_list_vnew(
+			.source = strdup("{}"),
+			.childs = ast_list_vnew(2,
 				(ast_node) {
 					.type = "ROOT",
-					.source = "(null)",
+					.source = 0,
 					.childs = 0
 				},
 				(ast_node) {
 					.type = "BRACE",
-					.source = "{}",
-					.childs = ast_list_vnew(
+					.source = strdup("{}"),
+					.childs = ast_list_vnew(2,
 						(ast_node) {
 							.type = "ROOT",
-							.source = "(null)",
+							.source = 0,
 							.childs = 0
 						},
 						(ast_node) {
 							.type = "BRACE",
-							.source = "{}",
-							.childs = ast_list_vnew(
+							.source = strdup("{}"),
+							.childs = ast_list_vnew(3,
 								(ast_node) {
 									.type = "ROOT",
-									.source = "(null)",
+									.source = 0,
 									.childs = 0
 								},
 								(ast_node) {
 									.type = "DQUOTE",
-									.source = "fedsefs\"dde",
-									.childs = ast_list_vnew(
+									.source = strdup("fedsefs\"dde"),
+									.childs = ast_list_vnew(1,
 										(ast_node) {
 											.type = "ROOT",
-											.source = "(null)",
+											.source = 0,
 											.childs = 0
 										}
 									)
 								},
 								(ast_node) {
 									.type = "IDENTIFIER",
-									.source = "hiiii",
-									.childs = ast_list_vnew(
+									.source = strdup("hiiii"),
+									.childs = ast_list_vnew(1,
 										(ast_node) {
 											.type = "ROOT",
-											.source = "(null)",
+											.source = 0,
 											.childs = 0
 										}
 									)
@@ -298,6 +297,8 @@ int main()
 			)
 		}
 	);
+
+	ast_list_free(l);
 
     return 0;
 }

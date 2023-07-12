@@ -72,39 +72,37 @@ void ast_error(const char *msg, const char *file, int line, const char *func) {
 
 ast_list *ast_list_root(ast_list *root)
 {
-	return ast_list_new(ALLOC(ast_node,
+	return ast_list_new((ast_node) {
 		.type = "ROOT",
 		.parent = root,
 		.childs = 0
-	));
+	});
 }
 
 ast_list *ast_push(ast_list *ast, const char *type, char *source)
 {
-	ast_list *l = ast_list_add(&ast, ALLOC(ast_node,
+	ast_list *l = ast_list_add(&ast, (ast_node) {
 		.type = type,
 		.source = source,
-		.parent = ast->data->parent
-	));
-	l->data->childs = ast_list_root(l);
+		.parent = ast->data.parent
+	});
+	l->data.childs = ast_list_root(l);
 	return l;
 }
 
-int ast_check_deref(ast_list *ast, int check_data, const char *file, int line, const char *func)
+int ast_check_deref(ast_list *ast, const char *file, int line, const char *func)
 {
 	if (!ast)
 		ast_error("Trying to access parent from a null ast ptr.", file, line, func);
-	if (!ast->data && check_data)
-		ast_error("Trying to access parent from a null ast->data ptr.", file, line, func);
 	return 0;
 }
 
-#define ast_parent(ast)	(ast_check_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->parent)
-#define ast_type(ast) 	(ast_check_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->type)
-#define ast_source(ast) (ast_check_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->source)
-#define ast_childs(ast) (ast_check_deref(ast, 1, __FILE__, __LINE__, __FUNCTION__) + ast->data->childs)
-#define ast_next(ast) (ast_check_deref(ast, 0, __FILE__, __LINE__, __FUNCTION__) + ast->next)
-#define ast_prev(ast) (ast_check_deref(ast, 0, __FILE__, __LINE__, __FUNCTION__) + ast->prev)
+#define ast_parent(ast)	(ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->data.parent)
+#define ast_type(ast) 	(ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->data.type)
+#define ast_source(ast) (ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->data.source)
+#define ast_childs(ast) (ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->data.childs)
+#define ast_next(ast) (ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->next)
+#define ast_prev(ast) (ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->prev)
 
 const ull max_depth = 7;
 

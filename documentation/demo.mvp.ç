@@ -1,30 +1,35 @@
-preprocess
-{
+ce_define
+(
+	...
+)
+
+ce_preprocess
+(
 	ast_register ...
 
-	compiler register ... w/ lambda
-}
+	compiler register ... w/ (or w/out) lambda
+)
 
-preprocess
-{
+ce_preprocess
+(
 	if (platform == .. )
 		_( ... )
 	else
 		_(...)
-}
+)
 
-preprocess
-{
+ce_preprocess
+(
 	const int DEBUG = 0;
-}
+)
 
-preprocess
-{
+ce_preprocess
+(
 	// will also load ast ext within an include file
 	#include "...."
-}
+)
 
 int main()
 {
-	printf("%i\n", preprocess { _(42); });
+	printf("%s\n", ce_preprocess ( _(42); ));
 }

@@ -8,6 +8,10 @@
 # define ull unsigned long long
 # define ll long long# define ull unsigned long long
 # define STR(...) #__VA_ARGS__
+# define CONCATENATE(arg1, arg2)   CONCATENATE1(arg1, arg2)
+# define CONCATENATE1(arg1, arg2)  CONCATENATE2(arg1, arg2)
+# define CONCATENATE2(arg1, arg2)  arg1##arg2
+# define IS_EMPTY(...) ( sizeof( (char[]){#__VA_ARGS__} ) == 1 )
 # define ALLOC(TYPE, ...) ({					\
 	TYPE *o = malloc(sizeof(TYPE));				\
     if (!o)                                     \
@@ -52,7 +56,18 @@ NAME    *NAME ## _last(NAME *l)			\
     }									\
     return 0;							\
 }										\
-										\
+ull 	NAME ## _count(NAME *l)			\
+{										\
+	ull		o = 0;						\
+    while (l)							\
+    {									\
+		o += 1;							\
+        if (!l->next)					\
+            return (o);					\
+        l = l->next;					\
+    }									\
+    return 0;							\
+}										\
 NAME    *NAME ## _new(TYPE data)		\
 {										\
     NAME *o;							\
@@ -129,7 +144,7 @@ void   NAME ## _del(NAME **l, NAME *k)  \
         if (it == k)					\
         {								\
             if (FREEF)		            \
-                ((void(*)(void*))FREEF)((void*)(unsigned long long)it->data);\
+                (FREEF)(it->data);		\
             free(it);					\
             *prev = swp;				\
         }								\
@@ -149,7 +164,7 @@ void    NAME ## _free(NAME *l)          \
     {									\
         swp = it->next;					\
         if (FREEF)			            \
-                ((void(*)(void*))FREEF)((void*)(unsigned long long)it->data);\
+                (FREEF)(it->data);		\
         free(it);						\
         it = swp;						\
     }									\
