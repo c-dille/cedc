@@ -1,6 +1,6 @@
 Licence pour le langage de programmation C Cédille et le compilateur Cédille
 
-Version 1.0, 14/07/2023
+Version 1.1, 14/07/2023
 
 Auteur : d4wae89d498 (sous pseudonyme)
 
@@ -26,6 +26,6 @@ Autorisation et restrictions d'utilisation :
 
 10. Cette licence s'applique à l'ensemble du langage de programmation C Cédille et du compilateur Cédille, y compris toutes les parties constitutives, les bibliothèques, les modules, les fonctions et les structures de données qui en font partie. Toute utilisation, modification ou distribution de ces éléments est soumise aux termes de cette licence.
 
-En utilisant le langage C Cédille et le compilateur Cédille, vous acceptez les termes de cette licence.
+En utilisant le langage C Cédille ou le compilateur Cédille, vous acceptez les termes de cette licence.
 
 © 2023 d4wae89d498 (sous pseudonyme). Tous droits réservés.
