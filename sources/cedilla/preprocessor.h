@@ -2,21 +2,6 @@
 # define MACRO_H
 # include "parser.h"
 
-typedef struct
-{
-	void	*ptr;
-	void	(*free)(void*);
-	void	*(*clone)(void*);
-}	object;
-DEF_KLIST_PROTO(object, object_list);
-void	free_object_list(object_list_entry *l)
-{
-	if (l->value.free)
-		l->value.free(l->value.ptr);
-	free(l);
-}
-DEF_KLIST(object, object_list, free_object_list);
-
 typedef enum
 {
 	RESTART_PREPROCESSOR = -1,

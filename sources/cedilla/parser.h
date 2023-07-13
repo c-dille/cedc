@@ -1,6 +1,7 @@
 #ifndef PARSER_H
 # define PARSER_H
 # include "ast.h"
+# include "../file/file.h"
 
 typedef enum
 {
@@ -11,14 +12,14 @@ typedef enum
 }   parser_action;
 typedef struct s_parser_context parser_context;
 typedef parser_action(*parser)(parser_context *ctx, const char *fmt, ast_list *ast);
-DEF_KLIST_PROTO(parser, parser_list);
-DEF_KLIST(parser, parser_list, free);
+DEF_KLIST_PROTO(parser, parser_klist);
+DEF_KLIST(parser, parser_klist, free);
 
 void parse_info(parser_context *ctx, const char *msg, ...);
 void parse_error(parser_context *ctx, const char *msg, ...);
 
 typedef struct s_macro_list macro_list;
-typedef struct s_object_list object_list;
+typedef struct s_object_klist object_klist;
 
 struct s_parser_context
 {
@@ -29,9 +30,9 @@ struct s_parser_context
 	const char 	*begin_ptr;
 	const char	*end_ptr;
 	const char 	*parser_name;
-	parser_list	*parsers;
-	bool 	(*preprocess)(parser_context*, ast_list *);
-	object_list	*objects;
+	parser_klist	*parsers;
+	bool 		(*preprocess)(parser_context*, ast_list *);
+	object_klist	*objects;
 	macro_list	*macros;
 	// preprocess() function on the AST
 	// macro_list
@@ -74,6 +75,8 @@ ast_list *ast_list_root(ast_list *root)
 {
 	return ast_list_new((ast_node) {
 		.type = "ROOT",
+		.source = 0,
+		.objects = 0,
 		.parent = root,
 		.childs = 0
 	});
@@ -84,7 +87,9 @@ ast_list *ast_push(ast_list *ast, const char *type, char *source)
 	ast_list *l = ast_list_add(&ast, (ast_node) {
 		.type = type,
 		.source = source,
-		.parent = ast->data.parent
+		.objects = 0,
+		.parent = ast->data.parent,
+		.childs = 0
 	});
 	l->data.childs = ast_list_root(l);
 	return l;
@@ -109,7 +114,7 @@ const ull max_depth = 7;
 ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 {
 	parser_action 	pa;
-	parser_list		*it;
+	parser_klist		*it;
 
 	if (ctx->depth > max_depth)
 		parse_error(ctx, "stack error, depth exceed maximum of : %llu\n", max_depth);
@@ -161,20 +166,27 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 			parse_error(ctx, "unknow syntax [%.7s...].", fmt);
 	}
 	if (!*fmt && oj_depth)
-		parse_error(ctx, "opened pair.");
+		parse_error(ctx, "opened pair. depth=%llu [%.10s]", oj_depth, ctx->begin_ptr);
 	ull new_len = fmt - begi_fmt_ptr;
 	ctx->depth -= 1;
 	ctx->collumn = oj_collumn;
 	ctx->line = oj_line;
-	printf("PARSED [depth=%llu] :: [%.*s]\n", ctx->depth, (int)new_len, fmt - new_len);
+	printf("PARSED [depth=%llu line=%llu] :: [%.*s]\n", ctx->depth, oj_line, (int)new_len, fmt - new_len);
 	ctx->collumn -= 1;
 	return (new_len);
 }
 
-ull   parse_file(parser_context *ctx, parser_list *parsers, const char *path, ast_list *out)
+// TODO : also set line, col and backup and restore original positions
+ull   parse_file(parser_context *ctx, const char *path, ast_list *out)
 {
 	char	*src = read_file(path);
+	if (!src)
+		return 0;
+
+	ctx->begin_ptr = src;
+	ctx->end_ptr = src + strlen(src);
 	ull len = parse(ctx, src, out);
+
 	free(src);
 	return len;
 }

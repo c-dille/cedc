@@ -175,21 +175,21 @@ preprocessor_action	test(parser_context *ctx, ast_list *l)
 
 int main()
 {
-	parser_list	*parsers = 0;
+	parser_klist	*parsers = 0;
 
-	parser_list_set(&parsers, KV(comment));
-	parser_list_set(&parsers, KV(mlcomment));
-	parser_list_set(&parsers, KV(space));
-	parser_list_set(&parsers, KV(identifier));
-	parser_list_set(&parsers, KV(operator));
-	parser_list_set(&parsers, KV(quote));
-	parser_list_set(&parsers, KV(dquote));
-	parser_list_set(&parsers, KV(brace));
-	parser_list_set(&parsers, KV(parenthesis));
-	parser_list_set(&parsers, KV(bracket));
-	parser_list_set(&parsers, KV(endbrace));
-	parser_list_set(&parsers, KV(endparenthesis));
-	parser_list_set(&parsers, KV(endbracket));
+	parser_klist_set(&parsers, KV(comment));
+	parser_klist_set(&parsers, KV(mlcomment));
+	parser_klist_set(&parsers, KV(space));
+	parser_klist_set(&parsers, KV(identifier));
+	parser_klist_set(&parsers, KV(operator));
+	parser_klist_set(&parsers, KV(quote));
+	parser_klist_set(&parsers, KV(dquote));
+	parser_klist_set(&parsers, KV(brace));
+	parser_klist_set(&parsers, KV(parenthesis));
+	parser_klist_set(&parsers, KV(bracket));
+	parser_klist_set(&parsers, KV(endbrace));
+	parser_klist_set(&parsers, KV(endparenthesis));
+	parser_klist_set(&parsers, KV(endbracket));
 
 	macro_list *macros = 0;
 
@@ -211,12 +211,12 @@ int main()
 		.macros = macros
 	};
 
-	object_list_set(&ctx.objects, "test", (object){.ptr="test",.free=0, .clone=0});
+	object_klist_set(&ctx.objects, "test", (object){.ptr="test",.free=0, .clone=0, .compile=0, .decompile=0});
 
 	if (!parse(&ctx, fmt, ast))
 		return 1;
 
-	object_list_free(ctx.objects);
+	object_klist_free(ctx.objects);
 
     printf("AST type: %s\n", ast_type(ast_next(ast)));
     printf("AST value: %s\n",  ast_source(ast_next(ast)));
@@ -232,7 +232,7 @@ int main()
 	ast_dump(ast);
 
 	ast_list_free(ast);
-	parser_list_free(parsers);
+	parser_klist_free(parsers);
 
 //	return 0;
 	__auto_type l = ast_list_vnew(2,

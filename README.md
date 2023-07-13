@@ -7,6 +7,10 @@
 - [x] klist : add an exists function, and allow non pointers type
 - [x] determine logic, way to parse and compile at same time for single file pass ?
 - [x] ast_node, remove useless alloc
+- [ ] compile / uncompile object_klist within ctx
+- [ ] maybe add an escape / unescape function to add/remove \" etc.
+- [ ] for object, create a wrapper around to get correct types ?
+- [ ] name consitency
 
 *PARSER*
 
