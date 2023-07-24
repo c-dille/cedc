@@ -34,14 +34,14 @@ int main(int ac, char **av)
 
 	macro_list *macros = 0;
 
-	macro_list_set(&macros, KV(test));
+	macro_list_set(&macros, KV(ce_preprocess));
 
 	ast_list	*ast = ast_list_root(0);
 	parser_context ctx = (parser_context)
 	{
 		.file_path = "<text>",
 		.line = 1,
-		.collumn = 0,
+		.collumn = 1,
 		.depth = 0,
 		.parser_name = "",
 		.parsers = parsers,
@@ -50,7 +50,7 @@ int main(int ac, char **av)
 		.macros = macros
 	};
 
-	object_klist_set(&ctx.objects, "test", (object){.ptr="test",.free=0, .clone=0, .compile=0});
+	object_klist_set(&ctx.objects, "test", (object){.ptr="test", .free=0, .clone=0, .compile=0});
 
 	if (!parse_file(&ctx, av[1], ast))
 	{
@@ -60,7 +60,7 @@ int main(int ac, char **av)
 	}
 	if (ac == 2)
 	{
-		ast_dump(ast);
+		//ast_dump(ast);
 	}
 	else if (ac == 3)
 	{

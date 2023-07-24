@@ -202,4 +202,17 @@ preprocessor_action	test(parser_context *ctx, ast_list *l)
 	printf(".");
 	return (STOP_PREPROCESSOR);
 }
+
+preprocessor_action	ce_preprocess(parser_context *ctx, ast_list *l)
+{
+
+	if (ast_type(l) == BRACE && !strcmp(ast_source(ast_prev(l)), "ce_preprocess"))
+	{
+		printf("Trying... %s %p l=%llu c=%llu ", ast_type(l), l, ctx->line, ctx->collumn);
+		printf("Found ! %s\n", l->prev->data.source);
+		return (STOP_PREPROCESSOR);
+	}
+	return (NEXT_MACRO);
+}
+
 #endif

@@ -1,0 +1,16 @@
+int main()
+{
+	@decorate 	test 	42
+	int	b;
+
+
+	ce_preprocess
+	{
+		auto v = ast_filter((ast) -> {
+			return ast->objects->contains("test");
+		})
+
+		foreach (v as ...)
+			...
+	}
+}

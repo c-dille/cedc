@@ -122,13 +122,14 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 		parse_error(ctx, "argument error, can not proceed without a parser list.\n");
 	if (fmt > ctx->end_ptr || fmt < ctx->begin_ptr)
 		parse_error(ctx, "overlapsing (grade A), one of ast parser (%s) returned an invalid length, which exceed format memory area.", it->data->key);
-	ctx->collumn += 1;
-	ull oj_line = ctx->line;
-	ull oj_collumn = ctx->collumn;
+	//ctx->collumn += 1;
 	ull oj_depth =  ctx->depth;
-	const char *begi_fmt_ptr = fmt;
+	const char *begin_fmt_ptr = fmt;
 	ctx->begin_ptr = fmt;
 	ctx->depth += 1;
+
+
+
 	pa = STOP_PARSER;
 	while (*fmt)
 	{
@@ -138,7 +139,7 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 		{
 			ctx->parser_name = it->data->key;
 			pa = it->data->value(ctx, fmt, out);
-			ctx->preprocess(ctx, out);
+
 			if (pa == STOP_PARSER)
 				break;
 			else if (pa == NEXT_SYNTAX)
@@ -153,7 +154,8 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 			else
 			{
 				fmt += pa;
-				ctx->collumn += pa;
+				if (pa == PARSE_NEXT_CHAR)
+					ctx->collumn += 1;
 				break ;
 			}
 			it = it->next;
@@ -164,15 +166,21 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 			break;
 		if (pa && !it)
 			parse_error(ctx, "unknow syntax [%.7s...].", fmt);
+		//printf("applying ce_macros in... %llu %llu\n", ctx->line, ctx->collumn);
+		if (pa != PARSE_NEW_LINE)
+		{
+			//printf("pa=%i\n", pa);
+			ctx->preprocess(ctx, ast_list_last(out));
+		}
 	}
 	if (!*fmt && oj_depth)
 		parse_error(ctx, "opened pair. depth=%llu [%.10s]", oj_depth, ctx->begin_ptr);
-	ull new_len = fmt - begi_fmt_ptr;
+	ull new_len = fmt - begin_fmt_ptr;
 	ctx->depth -= 1;
-	ctx->collumn = oj_collumn;
-	ctx->line = oj_line;
-	printf("PARSED [depth=%llu line=%llu] :: [%.*s]\n", ctx->depth, oj_line, (int)new_len, fmt - new_len);
-	ctx->collumn -= 1;
+
+
+
+	printf("PARSED [depth=%llu line=%llu col=%llu] :: [%.*s]\n", ctx->depth, ctx->line, ctx->collumn, (int)new_len, fmt - new_len);
 	return (new_len);
 }
 

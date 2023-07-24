@@ -1,35 +1,18 @@
-ce_define
-(
-	...
-)
 
-ce_preprocess
-(
-	ast_register ...
+@define const char 	*OSX = "OSX";
+@define const char 	*platform = OSX;
+@preprocess
+{
+	if (platform != OSX )
+		exit(_(Unsupported platform.));
+}
+@undefine OSX
+@undefine platform
 
-	compiler register ... w/ (or w/out) lambda
-)
-
-ce_preprocess
-(
-	if (platform == .. )
-		_( ... )
-	else
-		_(...)
-)
-
-ce_preprocess
-(
-	const int DEBUG = 0;
-)
-
-ce_preprocess
-(
-	// will also load ast ext within an include file
-	#include "...."
-)
+#include <stdio.h>
+//soon : @include <stdio.h>
 
 int main()
 {
-	printf("%s\n", ce_preprocess ( _(42); ));
+	printf("%s\n", @preprocess { _(42); });
 }

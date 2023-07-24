@@ -173,6 +173,12 @@ preprocessor_action	test(parser_context *ctx, ast_list *l)
 	return (STOP_PREPROCESSOR);
 }
 
+preprocessor_action	preprocess(parser_context *ctx, ast_list *l)
+{
+	printf(".");
+	return (STOP_PREPROCESSOR);
+}
+
 int main()
 {
 	parser_klist	*parsers = 0;
