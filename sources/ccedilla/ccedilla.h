@@ -203,11 +203,30 @@ preprocessor_action	test(parser_context *ctx, ast_list *l)
 	return (STOP_PREPROCESSOR);
 }
 
+/*
+
+here nothin after define ... either use {} and then call parse, or proceed at each colons
+
+*/
+preprocessor_action	ce_define(parser_context *ctx, ast_list *l)
+{
+
+	if (ast_type(l) == BRACE && !strcmp(ast_source(ast_prev(l)), "ce_define"))
+	{
+		// todo : remove ce_preprocess  and replace by parse(...) stdout of .so call
+		printf("Trying... %s %p l=%llu c=%llu ", ast_type(l), l, ctx->line, ctx->collumn);
+		printf("Found ! %s\n", l->prev->data.source);
+		return (STOP_PREPROCESSOR);
+	}
+	return (NEXT_MACRO);
+}
+
 preprocessor_action	ce_preprocess(parser_context *ctx, ast_list *l)
 {
 
 	if (ast_type(l) == BRACE && !strcmp(ast_source(ast_prev(l)), "ce_preprocess"))
 	{
+		// todo : remove ce_preprocess  and replace by parse(...) stdout of .so call
 		printf("Trying... %s %p l=%llu c=%llu ", ast_type(l), l, ctx->line, ctx->collumn);
 		printf("Found ! %s\n", l->prev->data.source);
 		return (STOP_PREPROCESSOR);

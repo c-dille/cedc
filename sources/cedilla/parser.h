@@ -109,7 +109,7 @@ int ast_check_deref(ast_list *ast, const char *file, int line, const char *func)
 #define ast_next(ast) (ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->next)
 #define ast_prev(ast) (ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->prev)
 
-const ull max_depth = 7;
+const ull max_depth = 20;
 
 ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 {
@@ -180,7 +180,7 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 
 
 
-	printf("PARSED [depth=%llu line=%llu col=%llu] :: [%.*s]\n", ctx->depth, ctx->line, ctx->collumn, (int)new_len, fmt - new_len);
+	//printf("PARSED [depth=%llu line=%llu col=%llu] :: [%.*s]\n", ctx->depth, ctx->line, ctx->collumn, (int)new_len, fmt - new_len);
 	return (new_len);
 }
 

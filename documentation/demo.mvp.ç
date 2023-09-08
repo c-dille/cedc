@@ -11,8 +11,42 @@
 
 #include <stdio.h>
 //soon : @include <stdio.h>
+//soon : optional interoperabiloty with C-Pre-Processor
 
 int main()
 {
 	printf("%s\n", @preprocess { _(42); });
 }
+
+
+/*
+*	Primitives :
+		@define
+		@undefine
+
+		@define prototype
+		@undefine prototype
+
+		@preprocess
+
+
+	Std :
+
+		@decorate
+		@include file.c
+		@parser name
+		@compiler name
+		@macro name
+
+	Language :
+
+		import / export
+		lambda
+		async/await
+		class
+		deferer
+		....
+
+
+*
+/

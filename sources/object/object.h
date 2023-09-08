@@ -19,7 +19,6 @@ typedef struct
 	void		(*free)(void*);
 	void		*(*clone)(void*);
 	void		(*compile)(int fd, void* data);
-	bool		is_const;
 }	object;
 
 /*

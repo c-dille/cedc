@@ -60,7 +60,7 @@ int main(int ac, char **av)
 	}
 	if (ac == 2)
 	{
-		//ast_dump(ast);
+		ast_dump(ast);
 	}
 	else if (ac == 3)
 	{

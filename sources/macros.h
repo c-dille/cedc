@@ -7,7 +7,7 @@
 # include <errno.h>
 # include "stdarg.h"
 # define ull unsigned long long
-# define ll long long# define ull unsigned long long
+# define ll long long
 # define STR(...) #__VA_ARGS__
 # define CONCATENATE(arg1, arg2)   CONCATENATE1(arg1, arg2)
 # define CONCATENATE1(arg1, arg2)  CONCATENATE2(arg1, arg2)
