@@ -126,6 +126,7 @@ parser_action   mlcomment(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
+// TODO : comment why 2, one for each sybol ?
 parser_action   brace(parser_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '{')

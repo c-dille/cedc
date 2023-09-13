@@ -1,16 +1,27 @@
 # cedilla40
 
+*ccedilla* is a compiler that implement a C superset using cedilla
+
+*cedilla* is a decent recursive parser implementation and an AST macro engine
+
 ## TODO
 
+- rename and or split macros.h
+- create a separate module for objects for AST ctx
+- implement define / in-source preprocessor definition / includes ?
+- parse all C syntax
+	- create a module for having a type list, having a list of types and names per scope is needed
+	- [ ] for object, create a wrapper around to get correct types ? (see object.h commentary)
+- determine if a preprocessor is really needed or if everuthing may be done in one pass within the parser
+	- benefits :
+		- simplify the ability to read next tokens aithout parsing em first
+- [ ] maybe add an escape / unescape function to add/remove \" etc (todo : check where it may be usefull).
 - [x] restructre project
 - [x] add klist to void*, free, type? as parser context objets for IE #define etc... + add a clone function
 - [x] klist : add an exists function, and allow non pointers type
 - [x] determine logic, way to parse and compile at same time for single file pass ?
 - [x] ast_node, remove useless alloc
-- [ ] compile / uncompile object_klist within ctx
-- [ ] maybe add an escape / unescape function to add/remove \" etc.
-- [ ] for object, create a wrapper around to get correct types ?
-- [ ] name consitency
+- [ ] name consitency, BRACKET => OPEN_BRACKET ?, also, is the ast tree root cell required (not if ast ptr ptr instead of ast ptr in prototypes, but more error prone)
 
 *PARSER*
 
