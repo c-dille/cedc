@@ -14,4 +14,5 @@
 # define CONCATENATE1(arg1, arg2)  CONCATENATE2(arg1, arg2)
 # define CONCATENATE2(arg1, arg2)  arg1##arg2
 # define DEF(X) const char *X = #X;
+# define KV(K) STR(K), K
 #endif

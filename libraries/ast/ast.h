@@ -55,6 +55,7 @@ void ast_dump_helper(ast_list *l, int depth)
 {
 	ast_list *it = l;
 
+	(void)	it;
 	if (!l)
 	{
 		printf("0\n");

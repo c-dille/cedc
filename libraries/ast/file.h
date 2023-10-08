@@ -10,6 +10,7 @@ char	*read_file(const char *path)
 	ssize_t	bytes;
 	char	*ret;
 
+	(void)	ret;
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
 	{

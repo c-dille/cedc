@@ -57,6 +57,7 @@ NAME    *NAME ## _add(NAME **l, TYPE data)\
     NAME *last;							\
     NAME *prev;							\
                                         \
+	(void)	prev;						\
     prev = 0;                           \
     last = *l;							\
     while (last)						\
@@ -81,7 +82,8 @@ NAME    *NAME ## _link(NAME **l, NAME *i)\
 {										\
     NAME *last;							\
     NAME *prev;							\
-                                        \
+										\
+	(void)	prev;                       \
     prev = 0;                           \
     last = *l;							\
     while (last)						\
