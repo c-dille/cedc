@@ -1,7 +1,7 @@
 #ifndef OBJECT_KLIST_H
 # define OBJECT_KLIST_H
 # include "object.h"
-# include "../list/klist.h"
+# include "klist.h"
 /*
 	ptr = strdup("yoo")
 	nptr = strdup(ptr) // clone

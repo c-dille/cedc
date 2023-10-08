@@ -1,6 +1,6 @@
-#ifndef C_H
-# define C_H
-# include "../cedilla/parser.h"
+#ifndef CEDILLA_H
+# define CEDILLA_H
+# include <ast/parser.h>
 
 char* findlastunescaped(const char* str, char c) {
     int i = 0;
@@ -39,6 +39,8 @@ DEF(BRACKET)
 
 parser_action   space(parser_context *ctx, const char *fmt, ast_list *ast)
 {
+	(void) ctx;
+	(void) ast;
 	if (*fmt == '\n')
 		return PARSE_NEW_LINE;
 	if (isspace(*fmt))
@@ -49,6 +51,7 @@ parser_action   space(parser_context *ctx, const char *fmt, ast_list *ast)
 
 parser_action	identifier(parser_context *ctx, const char *fmt, ast_list *ast)
 {
+	(void) ctx;
 	ull	len = 0;
 	while (isidentifier(fmt[len]))
 		len += 1;
@@ -62,6 +65,7 @@ parser_action	identifier(parser_context *ctx, const char *fmt, ast_list *ast)
 
 parser_action	operator(parser_context *ctx, const char *fmt, ast_list *ast)
 {
+	(void) ctx;
 	ull	len = 0;
 	while (isoperator(fmt[len]))
 		len += 1;
@@ -75,6 +79,7 @@ parser_action	operator(parser_context *ctx, const char *fmt, ast_list *ast)
 
 parser_action   quote(parser_context *ctx, const char *fmt, ast_list *ast)
 {
+	(void) ctx;
 	if (*fmt == '\'')
 	{
 		char *lastunescaped = findlastunescaped(fmt + 1, '\'');
@@ -88,6 +93,7 @@ parser_action   quote(parser_context *ctx, const char *fmt, ast_list *ast)
 
 parser_action   dquote(parser_context *ctx, const char *fmt, ast_list *ast)
 {
+	(void) ctx;
 	if (*fmt == '"')
 	{
 		char *lastunescaped = findlastunescaped(fmt + 1, '"');
@@ -102,6 +108,8 @@ parser_action   dquote(parser_context *ctx, const char *fmt, ast_list *ast)
 
 parser_action   comment(parser_context *ctx, const char *fmt, ast_list *ast)
 {
+	(void) ctx;
+	(void) ast;
 	if (*fmt == '/' && fmt[1] == '/' && ctx->collumn == 1)
 	{
 		ull len = 0;
@@ -114,6 +122,8 @@ parser_action   comment(parser_context *ctx, const char *fmt, ast_list *ast)
 
 parser_action   mlcomment(parser_context *ctx, const char *fmt, ast_list *ast)
 {
+	(void) ctx;
+	(void) ast;
 	if (fmt[0] == '/' && fmt[1] == '*')
 	{
 		ull len = 0;
@@ -200,6 +210,8 @@ parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
 
 preprocessor_action	test(parser_context *ctx, ast_list *l)
 {
+	(void)	ctx;
+	(void) l;
 	printf(".");
 	return (STOP_PREPROCESSOR);
 }

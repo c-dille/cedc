@@ -1,4 +1,7 @@
+# IDE
 .vscode
+.idea
+tags
 
 # Prerequisites
 *.d

@@ -1,7 +1,8 @@
 #ifndef PARSER_H
 # define PARSER_H
+# include "file.h"
 # include "ast.h"
-# include "../file/file.h"
+
 
 typedef enum
 {
@@ -114,21 +115,20 @@ const ull max_depth = 20;
 ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 {
 	parser_action 	pa;
-	parser_klist		*it;
+	parser_klist	*it;
 
+	it = NULL;
 	if (ctx->depth > max_depth)
 		parse_error(ctx, "stack error, depth exceed maximum of : %llu\n", max_depth);
 	if (!ctx->parsers)
 		parse_error(ctx, "argument error, can not proceed without a parser list.\n");
 	if (fmt > ctx->end_ptr || fmt < ctx->begin_ptr)
-		parse_error(ctx, "overlapsing (grade A), one of ast parser (%s) returned an invalid length, which exceed format memory area.", it->data->key);
+		parse_error(ctx, "overlapsing (grade A), one of ast parser (%s) returned an invalid length, which exceed format memory area.", "it->data->key ???");
 	//ctx->collumn += 1;
 	ull oj_depth =  ctx->depth;
 	const char *begin_fmt_ptr = fmt;
 	ctx->begin_ptr = fmt;
 	ctx->depth += 1;
-
-
 
 	pa = STOP_PARSER;
 	while (*fmt)

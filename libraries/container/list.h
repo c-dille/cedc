@@ -1,6 +1,6 @@
 #ifndef LIST_H
 # define LIST_H
-# include "../macros.h"
+# include <ce_macros.h>
 # define DEF_LIST_PROTO(TYPE, NAME)     \
                                         \
 	typedef struct s_ ## NAME			\
@@ -148,6 +148,7 @@ NAME    * NAME ## _clone(NAME *l, TYPE (*clone)(TYPE))\
     NAME    *it;						\
     NAME    *out = 0;					\
 										\
+	(void) clone;						\
     it = l;								\
     while (it)							\
     {									\

@@ -1,6 +1,6 @@
 #ifndef OBJECT_H
 # define OBJECT_H
-# include "./../macros.h"
+# include <ce_macros.h>
 /*
 	ptr = strdup("yoo")
 	nptr = strdup(ptr) // clone

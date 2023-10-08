@@ -1,7 +1,10 @@
 
 @define const char 	*OSX = "OSX";
-@define const char 	*platform = OSX;
-@preprocess
+// need to register a label without additional parsing
+@define platform const char 	*platform = OSX;
+@variable name: int = 4;
+
+@preprocess	platform check
 {
 	if (platform != OSX )
 		exit(_(Unsupported platform.));

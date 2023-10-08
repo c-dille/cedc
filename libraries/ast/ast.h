@@ -1,7 +1,7 @@
-#ifndef AST_MACRO_H
-# define AST_MACRO_H
-# include "./../macros.h"
-# include "./../object/object_klist.h"
+#ifndef AST_H
+# define AST_H
+# include <ce_macros.h>
+# include <container/object_klist.h>
 
 typedef struct s_ast_node ast_node;
 typedef struct s_ast_list ast_list;

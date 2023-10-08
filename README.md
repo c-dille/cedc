@@ -10,6 +10,8 @@
 - create a separate module for objects for AST ctx
 - implement define / in-source preprocessor definition / includes ?
 - parse all C syntax
+	- check the best option between a module per C syntaxes or built in within compiler ?
+		-> Need for correct type analysis to perform parsing ?
 	- create a module for having a type list, having a list of types and names per scope is needed
 	- [ ] for object, create a wrapper around to get correct types ? (see object.h commentary)
 - determine if a preprocessor is really needed or if everuthing may be done in one pass within the parser

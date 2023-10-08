@@ -1,6 +1,6 @@
 #ifndef FILE_H
 # define FILE_H
-# include "../macros.h"
+# include <ce_macros.h>
 
 char	*read_file(const char *path)
 {
@@ -18,7 +18,7 @@ char	*read_file(const char *path)
 	}
 	fsize = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
-	src = malloc(fsize + 1);
+	src = (char*) malloc(fsize + 1);
 	if (!src)
 	{
 		close(fd);

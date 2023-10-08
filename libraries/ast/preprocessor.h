@@ -1,5 +1,5 @@
-#ifndef MACRO_H
-# define MACRO_H
+#ifndef PREPROCESSOR_H
+# define PREPROCESSOR_H
 # include "parser.h"
 
 typedef enum
