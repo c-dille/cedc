@@ -1,9 +1,10 @@
 headers = $(shell find * -type f -name "*.h")
+sources = $(shell find * -type f -name "*.c")
 
 
 all:	cedilla
 
-cedilla:	$(headers)
+cedilla:	$(headers) $(sources) Makefile
 	cc -Wall -Werror -Wextra sources/*.c -o cedilla -I includes -I libraries
 
 clean:
