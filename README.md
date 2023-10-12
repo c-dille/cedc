@@ -1,8 +1,6 @@
 # cedilla40
 
-*ccedilla* is a compiler that implement a C superset using cedilla
-
-*cedilla* is a decent recursive parser implementation and an AST macro engine
+*cedilla* is a decent recursive parser implementation and an AST macro engine, it comes with C supersets examples
 
 ## TODO
 
