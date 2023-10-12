@@ -2,10 +2,7 @@
 # define OBJECT_H
 # include <macros.h>
 /*
-	ptr = strdup("yoo")
-	nptr = strdup(ptr) // clone
-	printf("strdup()")
-*/
+
 
 DEF(STRING)
 DEF(STATIC_STRING)
@@ -21,7 +18,7 @@ typedef struct
 	void		(*compile)(int fd, void* data);
 }	object;
 
-/*
+
 
 #define DEF_OBJECT_PROTO(TYPE_NAME, TYPE)											\
 {																					\
