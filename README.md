@@ -12,9 +12,7 @@
 		-> Need for correct type analysis to perform parsing ?
 	- [ ] create a module for having a type list, having a list of types and names per scope is needed
 	- [ ] for object, create a wrapper around to get correct types ? (see object.h commentary)
-- [x] determine if a preprocessor is really needed or if everuthing may be done in one pass within the parser
-	- benefits :
-		- simplify the ability to read next tokens aithout parsing em first
+- [ ] choose between a single pass and ast macro in reverse order, or a parsing pass and a second preprocessor pass 
 - [ ] maybe add an escape / unescape function to add/remove \" etc (todo : check where it may be usefull).
 - [x] restructre project
 - [x] add klist to void*, free, type? as parser context objets for IE #define etc... + add a clone function
