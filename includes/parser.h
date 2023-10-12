@@ -18,7 +18,7 @@ void parse_info(cedilla_context *ctx, const char *msg, ...);
 void parse_error(cedilla_context *ctx, const char *msg, ...);
 
 typedef struct s_preprocessor_klist preprocessor_klist;
-typedef struct s_object_klist object_klist;
+//typedef struct s_object_klist object_klist;
 
 struct s_cedilla_context
 {
@@ -29,8 +29,10 @@ struct s_cedilla_context
 	const char 				*begin_ptr;
 	const char				*end_ptr;
 	parser_klist			*parsers;
-	object_klist			*objects;
+//	object_klist			*objects;
+	void*					objects;
 	preprocessor_klist		*preprocessors;
+
 	// TODO: compiler_klist
 };
 
