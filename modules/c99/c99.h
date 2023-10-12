@@ -1,6 +1,6 @@
 #ifndef CEDILLA_H
 # define CEDILLA_H
-# include <ast/parser.h>
+# include <cedilla.h>
 
 char* findlastunescaped(const char* str, char c) {
     int i = 0;
@@ -37,7 +37,7 @@ DEF(BRACE)
 DEF(PARENTHESIS)
 DEF(BRACKET)
 
-parser_action   space(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   space(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	(void) ctx;
 	(void) ast;
@@ -49,7 +49,7 @@ parser_action   space(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action	identifier(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action	identifier(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	(void) ctx;
 	ull	len = 0;
@@ -63,7 +63,7 @@ parser_action	identifier(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action	operator(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action	operator(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	(void) ctx;
 	ull	len = 0;
@@ -77,7 +77,7 @@ parser_action	operator(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action   quote(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   quote(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	(void) ctx;
 	if (*fmt == '\'')
@@ -91,7 +91,7 @@ parser_action   quote(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action   dquote(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   dquote(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	(void) ctx;
 	if (*fmt == '"')
@@ -106,7 +106,7 @@ parser_action   dquote(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action   comment(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   comment(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	(void) ctx;
 	(void) ast;
@@ -120,7 +120,7 @@ parser_action   comment(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action   mlcomment(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   mlcomment(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	(void) ctx;
 	(void) ast;
@@ -137,7 +137,7 @@ parser_action   mlcomment(parser_context *ctx, const char *fmt, ast_list *ast)
 }
 
 // TODO : comment why 2, one for each sybol ?
-parser_action   brace(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   brace(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '{')
 	{
@@ -149,7 +149,7 @@ parser_action   brace(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action   parenthesis(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   parenthesis(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '(')
 	{
@@ -162,7 +162,7 @@ parser_action   parenthesis(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action   bracket(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   bracket(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '[')
 	{
@@ -175,7 +175,7 @@ parser_action   bracket(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action   endbrace(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   endbrace(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == '}')
 	{
@@ -186,7 +186,7 @@ parser_action   endbrace(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action   endparenthesis(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   endparenthesis(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == ')')
 	{
@@ -197,7 +197,7 @@ parser_action   endparenthesis(parser_context *ctx, const char *fmt, ast_list *a
 	return NEXT_SYNTAX;
 }
 
-parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
+parser_action   endbracket(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == ']')
 	{
@@ -208,7 +208,7 @@ parser_action   endbracket(parser_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-preprocessor_action	test(parser_context *ctx, ast_list *l)
+preprocessor_action	test(cedilla_context *ctx, ast_list *l)
 {
 	(void)	ctx;
 	(void) l;
@@ -221,30 +221,32 @@ preprocessor_action	test(parser_context *ctx, ast_list *l)
 here nothin after define ... either use {} and then call parse, or proceed at each colons
 
 */
-preprocessor_action	ce_define(parser_context *ctx, ast_list *l)
+preprocessor_action	define(cedilla_context *ctx, ast_list *l)
 {
 
-	if (ast_type(l) == BRACE && !strcmp(ast_source(ast_prev(l)), "ce_define"))
+	if (ast_type(l) == BRACE && !strcmp(ast_source(ast_prev(l)), "define"))
 	{
-		// todo : remove ce_preprocess  and replace by parse(...) stdout of .so call
+		// todo : remove preprocess  and replace by parse(...) stdout of .so call
 		printf("Trying... %s %p l=%llu c=%llu ", ast_type(l), l, ctx->line, ctx->collumn);
 		printf("Found ! %s\n", l->prev->data.source);
 		return (STOP_PREPROCESSOR);
 	}
-	return (NEXT_MACRO);
+	return (NEXT_PREPROCESSOR);
 }
 
-preprocessor_action	ce_preprocess(parser_context *ctx, ast_list *l)
+/*
+preprocessor_action	preprocess(cedilla_context *ctx, ast_list *l)
 {
 
-	if (ast_type(l) == BRACE && !strcmp(ast_source(ast_prev(l)), "ce_preprocess"))
+	if (ast_type(l) == BRACE && !strcmp(ast_source(ast_prev(l)), "preprocess"))
 	{
-		// todo : remove ce_preprocess  and replace by parse(...) stdout of .so call
+		// todo : remove preprocess  and replace by parse(...) stdout of .so call
 		printf("Trying... %s %p l=%llu c=%llu ", ast_type(l), l, ctx->line, ctx->collumn);
 		printf("Found ! %s\n", l->prev->data.source);
 		return (STOP_PREPROCESSOR);
 	}
-	return (NEXT_MACRO);
+	return (NEXT_PREPROCESSOR);
 }
+*/
 
 #endif

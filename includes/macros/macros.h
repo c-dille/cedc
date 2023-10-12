@@ -5,9 +5,13 @@
 # include <ctype.h>
 # include <dlfcn.h>
 # include <errno.h>
+# include <stddef.h>
 # include <stdarg.h>
-# include "./ce_types.h"
-# include "./ce_debug.h"
+# include "./types.h"
+# include "./debug.h"
+# include "./file.h"
+# include "./list.h"
+# include "./klist.h"
 # define IS_EMPTY(...) ( sizeof( (char[]){#__VA_ARGS__} ) == 1 )
 # define STR(...) #__VA_ARGS__
 # define CONCATENATE(arg1, arg2)   CONCATENATE1(arg1, arg2)

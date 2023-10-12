@@ -1,6 +1,5 @@
-#ifndef KLIST_H
-# define KLIST_H
-# include "list.h"
+#ifndef CE_KLIST_H
+# define CE_KLIST_H
 # define DEF_KLIST_PROTO(TYPE, NAME)        \
                                             \
 typedef struct s_##NAME##_entry     {       \

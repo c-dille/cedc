@@ -6,17 +6,22 @@ typedef enum
 {
 	RESTART_PREPROCESSOR = -1,
 	STOP_PREPROCESSOR = 0,
-	NEXT_MACRO = 1
+	NEXT_PREPROCESSOR = 1
 }	preprocessor_action;
-typedef preprocessor_action (*macro)(parser_context *, ast_list *);
-DEF_KLIST_PROTO(macro, macro_list)
-DEF_KLIST(macro, macro_list, free)
+typedef preprocessor_action (*macro)(cedilla_context *, ast_list *);
+DEF_KLIST_PROTO(macro, preprocessor_klist)
+DEF_KLIST(macro, preprocessor_klist, free)
 
 
-
-bool preprocess(parser_context *ctx, ast_list *l)
+/*
+*	TODO:
+*
+*		Perform matches in reverse order in one pass,
+*		Or apply preprocessor in a second pass
+*/
+bool preprocess(cedilla_context *ctx, ast_list *l)
 {
-	macro_list	*it = ctx->macros;
+	preprocessor_klist	*it = ctx->preprocessors;
 	int	depth = 0;
 	while (it)
 	{
@@ -25,8 +30,10 @@ bool preprocess(parser_context *ctx, ast_list *l)
 		preprocessor_action pa = it->data->value(ctx, l);
 
 		if (pa == RESTART_PREPROCESSOR)
-			it = ctx->macros;
-
+		{
+			it = ctx->preprocessors;
+			continue;
+		}
 		if (!pa)
 			break ;
 

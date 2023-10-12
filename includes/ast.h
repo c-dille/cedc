@@ -1,7 +1,5 @@
 #ifndef AST_H
 # define AST_H
-# include <ce_macros.h>
-# include <container/object_klist.h>
 
 typedef struct s_ast_node ast_node;
 typedef struct s_ast_list ast_list;
@@ -9,7 +7,7 @@ typedef struct  s_ast_node
 {
     const char      *type;			// string object
     char      		*source;		// static string object OOORRR no need ...  because easier to read without for no sens
-	object_klist	*objects;
+	void			*objects;
 	ast_list 		*parent;		// ast list object ?
 	ast_list		*childs;		// ast list object ?
 }   ast_node;
@@ -20,7 +18,7 @@ DEF_LIST(ast_node, ast_list, ast_free_node);
 void ast_free_node(ast_node node)
 {
 	ast_list_free(node.childs);
-	object_klist_free(node.objects);
+	//object_klist_free(node.objects);
 	if (node.source)
 		free((void*)node.source);
 }

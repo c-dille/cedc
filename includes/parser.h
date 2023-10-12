@@ -1,8 +1,6 @@
 #ifndef PARSER_H
 # define PARSER_H
-# include "file.h"
 # include "ast.h"
-
 
 typedef enum
 {
@@ -11,38 +9,36 @@ typedef enum
     STOP_PARSER = 0,
     PARSE_NEXT_CHAR = 1,
 }   parser_action;
-typedef struct s_parser_context parser_context;
-typedef parser_action(*parser)(parser_context *ctx, const char *fmt, ast_list *ast);
+typedef struct s_cedilla_context cedilla_context;
+typedef parser_action(*parser)(cedilla_context *ctx, const char *fmt, ast_list *ast);
 DEF_KLIST_PROTO(parser, parser_klist);
 DEF_KLIST(parser, parser_klist, free);
 
-void parse_info(parser_context *ctx, const char *msg, ...);
-void parse_error(parser_context *ctx, const char *msg, ...);
+void parse_info(cedilla_context *ctx, const char *msg, ...);
+void parse_error(cedilla_context *ctx, const char *msg, ...);
 
-typedef struct s_macro_list macro_list;
+typedef struct s_preprocessor_klist preprocessor_klist;
 typedef struct s_object_klist object_klist;
 
-struct s_parser_context
+struct s_cedilla_context
 {
-	ull			collumn; // only used for parse error, rest may feeded to gcc #line
-	ull			line;
-	ull 		depth;
-	const char	*file_path;
-	const char 	*begin_ptr;
-	const char	*end_ptr;
-	const char 	*parser_name;
-	parser_klist	*parsers;
-	bool 		(*preprocess)(parser_context*, ast_list *);
-	object_klist	*objects;
-	macro_list	*macros;
+	ull						collumn; // only used for parse error, rest may feeded to gcc #line
+	ull						line;
+	ull 					depth;
+	const char				*file_path;
+	const char 				*begin_ptr;
+	const char				*end_ptr;
+	parser_klist			*parsers;
+	object_klist			*objects;
+	preprocessor_klist		*preprocessors;
 	// preprocess() function on the AST
-	// macro_list
+	// preprocessor_klist
 	// compiler_list
 };
 
 #include "preprocessor.h"
 
-void parse_info(parser_context *ctx, const char *msg, ...) {
+void parse_info(cedilla_context *ctx, const char *msg, ...) {
 	va_list	ap;
 	printf("Parse info in %s:%llu:%llu: ", ctx->file_path, ctx->line, ctx->collumn);
 	va_start(ap, msg);
@@ -51,7 +47,7 @@ void parse_info(parser_context *ctx, const char *msg, ...) {
 	va_end(ap);
 }
 
-void parse_error(parser_context *ctx, const char *msg, ...) {
+void parse_error(cedilla_context *ctx, const char *msg, ...) {
 	va_list	ap;
 	printf("Parse error in %s:%llu:%llu: ", ctx->file_path, ctx->line, ctx->collumn);
 	va_start(ap, msg);
@@ -112,7 +108,7 @@ int ast_check_deref(ast_list *ast, const char *file, int line, const char *func)
 
 const ull max_depth = 20;
 
-ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
+ull   parse(cedilla_context *ctx, const char *fmt, ast_list *out)
 {
 	parser_action 	pa;
 	parser_klist	*it;
@@ -137,7 +133,6 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 		it = ctx->parsers;
 		while (it && *fmt)
 		{
-			ctx->parser_name = it->data->key;
 			pa = it->data->value(ctx, fmt, out);
 
 			if (pa == STOP_PARSER)
@@ -166,11 +161,11 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 			break;
 		if (pa && !it)
 			parse_error(ctx, "unknow syntax [%.7s...].", fmt);
-		//printf("applying ce_macros in... %llu %llu\n", ctx->line, ctx->collumn);
+		//printf("applying preprocessors in... %llu %llu\n", ctx->line, ctx->collumn);
 		if (pa != PARSE_NEW_LINE)
 		{
 			//printf("pa=%i\n", pa);
-			ctx->preprocess(ctx, ast_list_last(out));
+			preprocess(ctx, ast_list_last(out));
 		}
 	}
 	if (!*fmt && oj_depth)
@@ -185,12 +180,11 @@ ull   parse(parser_context *ctx, const char *fmt, ast_list *out)
 }
 
 // TODO : also set line, col and backup and restore original positions
-ull   parse_file(parser_context *ctx, const char *path, ast_list *out)
+ull   parse_file(cedilla_context *ctx, const char *path, ast_list *out)
 {
 	char	*src = read_file(path);
 	if (!src)
 		return 0;
-
 	ctx->begin_ptr = src;
 	ctx->end_ptr = src + strlen(src);
 	ull len = parse(ctx, src, out);

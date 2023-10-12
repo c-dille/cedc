@@ -1,6 +1,5 @@
-#ifndef FILE_H
-# define FILE_H
-# include <ce_macros.h>
+#ifndef CE_FILE_H
+# define CE_FILE_H
 
 char	*read_file(const char *path)
 {

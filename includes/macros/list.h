@@ -1,6 +1,5 @@
-#ifndef LIST_H
-# define LIST_H
-# include <ce_macros.h>
+#ifndef CE_LIST_H
+# define CE_LIST_H
 # define DEF_LIST_PROTO(TYPE, NAME)     \
                                         \
 	typedef struct s_ ## NAME			\
