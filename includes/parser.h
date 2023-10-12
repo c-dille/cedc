@@ -31,9 +31,7 @@ struct s_cedilla_context
 	parser_klist			*parsers;
 	object_klist			*objects;
 	preprocessor_klist		*preprocessors;
-	// preprocess() function on the AST
-	// preprocessor_klist
-	// compiler_list
+	// TODO: compiler_klist
 };
 
 #include "preprocessor.h"
