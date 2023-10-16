@@ -1,26 +1,51 @@
 #include "c99.h"
 
-/*
-typedef struct s_module
-{
-	char 		*name;
-	float		version;
-
-	struct s_module	dependancies[];
-}	module;
-
-module c99 = {
-	"c99",
-	0.1,
-	.dependancies = {
-		{"preprocessor", 0.2},
-
-	},
-	"cc -Wall -Werror -Wextra"
-};
-*/
-
 #include "types/types.c"
+
+int define_eol(cedilla_context *ctx, const char *src)
+{
+	return 1;
+}
+
+int define_space(cedilla_context *ctx, const char *src)
+{
+	return 1;
+}
+
+int	define_token(cedilla_context *ctx, const char *type, const char *src)
+{
+	return 1;
+}
+
+int	define_token_group(cedilla_context *ctx, const char *type, const char *src)
+{
+	return 1;
+}
+
+int	define_token_string(cedilla_context *ctx, const char *type, const char *src)
+{
+	return 1;
+}
+
+
+ast_macro_result	type_prefixing(cedilla_context *ctx, ast_list *l)
+{
+	// should have a special rturn type for match so that we keep original match size
+	ast_macro_result	out = {0, 0};
+
+	if (out = match(l, TYPE, ANY, TYPE, UNTIL, IDENTIFIER))
+	{
+		//...
+
+		return (out);
+	}
+
+	return {0, 0};
+}
+
+DEF(TYPE);
+DEF(OP);
+
 
 int	load_module(cedilla_context *ctx)
 {
@@ -47,6 +72,60 @@ int	load_module(cedilla_context *ctx)
 	preprocessor_klist_set(&(ctx->preprocessors), KV(is_type));
 
 	printf("done. \n");
+
+	define_eol(ctx, "\n");
+
+	define_space(ctx, "\t");
+	define_space(ctx, " ");
+
+	define_comment(ctx, "//", 	"\n");
+	define_comment(ctx, "/*",	"*/");
+
+	define_token_group(ctx, "{", "}");
+	define_token_group(ctx, "(", ")");
+	define_token_group(ctx, "[", "]");
+
+	define_token_string(ctx, "\"", "\"");
+	define_token_string(ctx, "'", "'");
+
+	define_token(ctx, OP, "+");
+	define_token(ctx, OP, "-");
+	define_token(ctx, OP, "*");
+	define_token(ctx, OP, "/");
+	define_token(ctx, OP, "<");
+	define_token(ctx, OP, ">");
+	define_token(ctx, OP, "=");
+	define_token(ctx, OP, "^");
+	define_token(ctx, OP, "&");
+	define_token(ctx, OP, "%");
+
+	define_token(ctx, TYPE, "signed");
+	define_token(ctx, TYPE, "unsigned");
+	define_token(ctx, TYPE, "short");
+	define_token(ctx, TYPE, "long");
+	define_token(ctx, TYPE, "int");
+	define_token(ctx, TYPE, "auto");
+	define_token(ctx, TYPE, "char");
+	define_token(ctx, TYPE, "_Bool");
+	define_token(ctx, TYPE, "float");
+	define_token(ctx, TYPE, "double");
+	define_token(ctx, TYPE, "_Complex");
+
+
+
+
+	define_macro(ctx, type_prefixing);
+
+	ast_define_macro({m(BRACE, name)}, ^ (klist ... ){
+
+		ast_get(name)
+		ast_get
+
+		...
+
+		return new ast ...
+	});
+
 
 	return 0;
 }

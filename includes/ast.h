@@ -7,20 +7,38 @@ typedef struct  s_ast_node
 {
     const char      *type;			// string object
     char      		*source;		// static string object OOORRR no need ...  because easier to read without for no sens
-	void			*objects;
+	object			data;
 	ast_list 		*parent;		// ast list object ?
 	ast_list		*childs;		// ast list object ?
 }   ast_node;
 DEF_LIST_PROTO(ast_node, ast_list);
-void ast_free_node(ast_node );
-DEF_LIST(ast_node, ast_list, ast_free_node);
+void ast_node_free(ast_node n);
+ast_node 	ast_node_clone(ast_node n);
+DEF_LIST(ast_node, ast_list, ast_node_free, ast_node_clone);
 								// def ast_list_object ?
-void ast_free_node(ast_node node)
+void ast_node_free( ast_node n)
 {
-	ast_list_free(node.childs);
+	ast_list_free(n.childs);
 	//object_klist_free(node.objects);
-	if (node.source)
-		free((void*)node.source);
+	if (n.data.ptr && n.data.free)
+		n.data.free(n.data.ptr);
+	if (n.source)
+		free((void*)n.source);
+}
+
+ast_node 	ast_node_clone(ast_node n)
+{
+	ast_node	out;
+
+	out.parent = 0;
+	out.type = n.type;
+	out.source = strdup(out.source);
+	out.data = n.data;
+	if (n.data.ptr && n.data.clone)
+		out.data.ptr = n.data.clone(n.data.ptr);
+	out.childs = ast_list_clone(n.childs);
+
+	return out;
 }
 
 ast_list *ast_list_vnew(ull i, ...)
@@ -85,5 +103,7 @@ void ast_dump(ast_list *l)
 	ast_dump_helper(l, 1);
 	printf(");\n");
 }
+
+
 
 #endif

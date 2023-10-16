@@ -1,5 +1,6 @@
 #include "cedilla.h"
 
+// TODO : store arguments in a klist of char* so that modules could use em
 const char *base_include_keyword = "cedilla_load";
 
 parser_action   cedilla_load(cedilla_context *ctx, const char *fmt, ast_list *ast)
@@ -71,7 +72,7 @@ int main(int ac, char **av)
 		.parsers = parsers,
 		.preprocessors = preprocessors,
 	// TODO: .compilers = ...
-		.objects = 0,
+		.objects = {0,0,0},
 	};
 
 

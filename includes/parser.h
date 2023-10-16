@@ -12,7 +12,7 @@ typedef enum
 typedef struct s_cedilla_context cedilla_context;
 typedef parser_action(*parser)(cedilla_context *ctx, const char *fmt, ast_list *ast);
 DEF_KLIST_PROTO(parser, parser_klist);
-DEF_KLIST(parser, parser_klist, free);
+DEF_KLIST(parser, parser_klist, free, strdup);
 
 void parse_info(cedilla_context *ctx, const char *msg, ...);
 void parse_error(cedilla_context *ctx, const char *msg, ...);
@@ -29,8 +29,7 @@ struct s_cedilla_context
 	const char 				*begin_ptr;
 	const char				*end_ptr;
 	parser_klist			*parsers;
-//	object_klist			*objects;
-	void*					objects;
+	object					data;
 	preprocessor_klist		*preprocessors;
 
 	// TODO: compiler_klist

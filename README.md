@@ -12,7 +12,7 @@
 		-> Need for correct type analysis to perform parsing ?
 	- [ ] create a module for having a type list, having a list of types and names per scope is needed
 	- [ ] for object, create a wrapper around to get correct types ? (see object.h commentary)
-- [ ] choose between a single pass and ast macro in reverse order, or a parsing pass and a second preprocessor pass 
+- [x] choose between a single pass and ast macro in reverse order, or a parsing pass and a second preprocessor pass => 2nd pass
 - [ ] maybe add an escape / unescape function to add/remove \" etc (todo : check where it may be usefull).
 - [x] restructre project
 - [x] add klist to void*, free, type? as parser context objets for IE #define etc... + add a clone function
@@ -61,3 +61,43 @@
 - [ ] async await with io uring backend
 - [ ] defer keyword
 - [ ] class
+
+
+===
+
+preprocessing :
+
+
+=======
+
+
+2nd pass :
+
+
+Reverse order :
+
+cedilla_load
+
+cedilla_load ./modules/c99/c99
+// (if (ast_type == id and prev == load do ...))
+
+unsigned(ID) <--- TYPE
+unsigned(TYPE) long(ID) <--- TYPE
+unsigned long(TYPE) long(ID) <--- TYPE
+unsigned long long(TYPE) 	f(ID) <--- VAR
+unsigned long long(TYPE) 	f(ID) \( (Parenthesis)  <--- PROTOTYPE
+unsigned long long 	f(int
+unsigned long long 	f(int x
+unsigned long long 	f(int x )
+unsigned long long 	f(int x ) (PROTOTYPE) { (Braces) <--- named func decl
+unsigned long long 	f(int x ) { instr
+unsigned long long 	f(int x ) { instr }
+
+===> This logic would be same in both 2 pass or reverse order ?
+y e s
+
+===> Is there is a risk for misinterpretation ?
+
+
+shall syntax error checking be done in compile time or preprocessing time ? both ?
+BOTH

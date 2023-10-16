@@ -12,9 +12,9 @@ DEF_LIST_PROTO(NAME##_entry*, NAME);        \
 int     NAME ##_set(NAME **map, const char *key, TYPE value);\
 TYPE    NAME ##_get(NAME *map, const char *key);\
 
-# define DEF_KLIST(TYPE, NAME, FREEF)       \
+# define DEF_KLIST(TYPE, NAME, FREEF, CLONEF)       \
                                             \
-DEF_LIST(NAME##_entry*, NAME, FREEF)        \
+DEF_LIST(NAME##_entry*, NAME, FREEF, CLONEF)        \
                                             \
 int         NAME ## _isset(NAME **map, const char *key)\
 {                                           \

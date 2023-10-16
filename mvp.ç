@@ -1,6 +1,4 @@
 cedilla_load ./modules/c99/c99
 
-unsigned long long		f(int x)
-{
-	return x + 2;
-}
+
+unsigned long

@@ -1,80 +1,89 @@
 #include "types.h"
 
+DEF(TYPE)
+
+typedef struct {
+	int	len;
+	char *arr[5];
+} c_primitive_types;
+
 /*
 	STANDARD C99 TYPESS
 */
-char	*types[][5] = {
+c_primitive_types	types[] = {
 	// CHAR
-	{"unsigned", 	"char", 							0},
-	{"signed", 		"char", 							0},
-	{				"char",								0},
+	{2, {"unsigned", 	"char"}},
+	{2, {"signed",		"char"}},
+	{1, { 				"char"}},
 
 	// INT
-	{"unsigned", 	"long", 				"int",		0},
-	{"unsigned", 	"long", 	"long", 	"int",		0},
-	{"unsigned", 	"short", 				"int", 		0},
-	{"unsigned",							"int",		0},
+	{4, {"unsigned",	"long",		"long", 	"int"}},
+	{3, {"unsigned",	"long",		"int"}},
+	{3, {"unsigned",	"short",	"int"}},
+	{2, {"unsigned",	"int"}},
 
-	{"signed", 		"long", 	"long", 	"int",		0},
-	{"signed", 		"short", 				"int", 		0},
-	{"signed", 		"long", 				"int",		0},
-	{"signed",								"int",		0},
+	{4, {"signed",		"long",		"long", 	"int"}},
+	{3, {"signed",		"long",		"int"}},
+	{3, {"signed",		"short",	"int"}},
+	{2, {"signed",		"int"}},
 
-	{				"long",		"long", 	"int",		0},
-	{				"long", 				"int",		0},
-	{				"short", 				"int",		0},
-	{										"int",		0},
+	{3, {"long",		"long", 	"int"}},
+	{2, {"long",		"int"}},
+	{2, {"short",		"int"}},
+	{1, {"int"}},
 
 	// IMPLICIT INT
-	{				"long", 	"long",					0},
-	{				"long",								0},
-	{				"short",							0},
+	{3, {"unsigned",	"long",		"long"}},
+	{2, {"unsigned",	"long"}},
+	{2, {"unsigned",	"short"}},
+	{1, {"unsigned"}},
 
-	{"signed", 		"long", 	"long",					0},
-	{"signed", 		"long",								0},
-	{"signed", 		"short",							0},
-	{"signed",											0},
+	{3, {"signed",		"long",		"long"}},
+	{2, {"signed",		"long"}},
+	{2, {"signed",		"short"}},
+	{1, {"signed"}},
 
-	{"unsigned", 	"long", 	"long",					0},
-	{"unsigned", 	"long",								0},
-	{"unsigned", 	"short",							0},
-	{"unsigned",										0},
+	{2, {"long",		"long"}},
+	{1, {"long"}},
+	{1, {"short"}},
 
 	// FLOAT
-	{"long", 		"double",							0},
-	{				"double",							0},
-	{				"float",							0},
+	{2, {"long",		"double"}},
+	{1, {"double"}},
+	{1, {"float"}},
 
 	// BOOL
-	{				"_Bool",							0},
+	{1,	{"_Bool"}},
 
 	// COMPLEX
-	{"long", 		"double", 	"_Complex",				0},
-	{				"double", 	"_Complex",				0},
-	{				"float", 	"_Complex",				0},
-	{							"_Complex",				0},
+	{3, {"long", 		"double", 	"_Complex"}},
+	{2, {"double", 		"_Complex"}},
+	{2, {"float", 		"_Complex"}},
+	{1, {"_Complex"}},
 };
 
 #include "./../c99.h"
 
-
-int matches_type(char **type, ast_list *l) {
-    int i = 0;
-	printf("-\n");
-    while (type[i] && l) {
-		if (!(ast_type(l) == IDENTIFIER && !strcmp(type[i], ast_source(l))))
-			return 0;
-		printf("ok = %s %s\n", type[i], ast_source(l));
-        l = ast_prev(l);
-        i++;
-    }
-	//printf("end on %s\n", ast_source(l));
-	if (type[i] || l)
+int matches_type(c_primitive_types type, ast_list *l) {
+	int	type_len = type.len;
+	if (!type_len)
 		return 0;
-    return i;
+	int i = type_len - 1;
+    while (i >= 0 && l) {
+		if (!(ast_type(l) == IDENTIFIER && !strcmp(type.arr[i], ast_source(l))))
+		{
+			if (!strcmp(type.arr[type_len - 1], "long"))
+			printf("no! %s == ID? %s == %s ? prev=%s\n", ast_type(l), type.arr[i], ast_source(l), ast_source(ast_prev(l)));
+			return 0;
+		}
+        l = ast_prev(l);
+        i -= 1;
+    }
+ 	printf("%i\n", i);
+	return type_len;
 }
 
-void	replace_ast_node_with_type(ast_list *l, char **types)
+void	replace_ast_node_with_type(ast_list *l, c_primitive_types types)
 {
 	(void) l;
 	(void) types;
@@ -88,11 +97,22 @@ preprocessor_action is_type(cedilla_context *ctx, ast_list *l) {
         for (int i = 0; i < (int)(sizeof(types) / sizeof(types[0])); i++) {
             int r = matches_type(types[i], l);
 			if (r) {
+				//while (r = )
+
 				printf("%i\n", r);
+
 		        // replace the AST node's identifier with the type and set its type
                 // assuming there's a function or method called 'replace_ast_node_with_type'
                 replace_ast_node_with_type(l, types[i]);
-				printf("match ! %p\n", ast_next(l));
+
+
+				if (r > 1)
+				{
+					printf("match ! [%s] [%s] %s\n",ast_source(ast_prev(ast_prev(l))) , ast_source(ast_prev(l)), ast_source(l));
+					exit(0);
+				}
+			//	if ()
+			//	l->data.type = TYPE;
 
 			//	exit(0);
 				return NEXT_PREPROCESSOR;
