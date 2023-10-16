@@ -1,7 +1,5 @@
 #include "types.h"
 
-DEF(TYPE)
-
 typedef struct {
 	int	len;
 	char *arr[5];

@@ -1,51 +1,82 @@
 #include "c99.h"
 
+
+DEF(TYPE);
+DEF(OP);
+
 #include "types/types.c"
 
 int define_eol(cedilla_context *ctx, const char *src)
 {
+	(void) ctx;
+	(void) src;
 	return 1;
 }
 
 int define_space(cedilla_context *ctx, const char *src)
 {
+	(void) ctx;
+	(void) src;
+	return 1;
+}
+
+int	define_comment(cedilla_context *ctx, const char *from, const char *to)
+{
+	(void) ctx;
+	(void) from;
+	(void) to;
 	return 1;
 }
 
 int	define_token(cedilla_context *ctx, const char *type, const char *src)
 {
+	(void) ctx;
+	(void) type;
+	(void) src;
 	return 1;
 }
 
 int	define_token_group(cedilla_context *ctx, const char *type, const char *src)
 {
+	(void) ctx;
+	(void) type;
+	(void) src;
 	return 1;
 }
 
 int	define_token_string(cedilla_context *ctx, const char *type, const char *src)
 {
+	(void) ctx;
+	(void) type;
+	(void) src;
 	return 1;
 }
 
 
 ast_macro_result	type_prefixing(cedilla_context *ctx, ast_list *l)
 {
+
+	(void) ctx;
 	// should have a special rturn type for match so that we keep original match size
 	ast_macro_result	out = {0, 0};
 
-	if (out = match(l, TYPE, ANY, TYPE, UNTIL, IDENTIFIER))
+	out = match(l, TYPE, ANY, TYPE, UNTIL, IDENTIFIER);
+	if (out.match_size)
 	{
 		//...
 
 		return (out);
 	}
 
-	return {0, 0};
+	return out;
 }
 
-DEF(TYPE);
-DEF(OP);
-
+int define_macro(cedilla_context *ctx, void *f)
+{
+	(void) ctx;
+	(void) f;
+	return 1;
+}
 
 int	load_module(cedilla_context *ctx)
 {
@@ -116,6 +147,7 @@ int	load_module(cedilla_context *ctx)
 
 	define_macro(ctx, type_prefixing);
 
+/*
 	ast_define_macro({m(BRACE, name)}, ^ (klist ... ){
 
 		ast_get(name)
@@ -126,6 +158,6 @@ int	load_module(cedilla_context *ctx)
 		return new ast ...
 	});
 
-
+*/
 	return 0;
 }

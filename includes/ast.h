@@ -49,7 +49,7 @@ ast_list *ast_list_vnew(ull i, ...)
 	while (i)
 	{
 		ast_node n = va_arg(ap, ast_node);
-		ast_list_add(&r, (ast_node) {.type = n.type, .source = n.source, .objects=0, .childs = n.childs});
+		ast_list_add(&r, (ast_node) {.type = n.type, .source = n.source, .data={0,0,0,0,0}, .childs = n.childs});
 		i -= 1;
 	}
 	va_end(ap);

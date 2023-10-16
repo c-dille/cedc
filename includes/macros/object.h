@@ -1,6 +1,8 @@
 #ifndef OBJECT_H
 # define OBJECT_H
 
+// add a def object macro ?
+
 typedef struct s_object
 {
 	void	*ptr;
@@ -12,7 +14,9 @@ typedef struct s_object
 
 object	object_clone(object o)
 {
-	return (o.clone(o.ptr));
+	object out = o;
+	out.ptr = out.clone(o.ptr);
+	return out;
 }
 
 void 	object_free(object o)

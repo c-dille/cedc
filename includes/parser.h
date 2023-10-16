@@ -12,7 +12,7 @@ typedef enum
 typedef struct s_cedilla_context cedilla_context;
 typedef parser_action(*parser)(cedilla_context *ctx, const char *fmt, ast_list *ast);
 DEF_KLIST_PROTO(parser, parser_klist);
-DEF_KLIST(parser, parser_klist, free, strdup);
+DEF_KLIST(parser, parser_klist, free, ((void*(*)(void*))0));
 
 void parse_info(cedilla_context *ctx, const char *msg, ...);
 void parse_error(cedilla_context *ctx, const char *msg, ...);
@@ -35,7 +35,6 @@ struct s_cedilla_context
 	// TODO: compiler_klist
 };
 
-#include "preprocessor.h"
 
 void parse_info(cedilla_context *ctx, const char *msg, ...) {
 	va_list	ap;
@@ -72,7 +71,7 @@ ast_list *ast_list_root(ast_list *root)
 	return ast_list_new((ast_node) {
 		.type = "ROOT",
 		.source = 0,
-		.objects = 0,
+		.data = {0, 0, 0, 0, 0},
 		.parent = root,
 		.childs = 0
 	});
@@ -83,7 +82,7 @@ ast_list *ast_push(ast_list *ast, const char *type, char *source)
 	ast_list *l = ast_list_add(&ast, (ast_node) {
 		.type = type,
 		.source = source,
-		.objects = 0,
+		.data = {0, 0, 0, 0, 0},
 		.parent = ast->data.parent,
 		.childs = 0
 	});
@@ -104,6 +103,8 @@ int ast_check_deref(ast_list *ast, const char *file, int line, const char *func)
 #define ast_childs(ast) (ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->data.childs)
 #define ast_next(ast) (ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->next)
 #define ast_prev(ast) (ast_check_deref(ast, __FILE__, __LINE__, __FUNCTION__) + ast->prev)
+
+#include "preprocessor.h"
 
 const ull max_depth = 20;
 

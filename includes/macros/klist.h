@@ -14,7 +14,7 @@ TYPE    NAME ##_get(NAME *map, const char *key);\
 
 # define DEF_KLIST(TYPE, NAME, FREEF, CLONEF)       \
                                             \
-DEF_LIST(NAME##_entry*, NAME, FREEF, CLONEF)        \
+DEF_LIST(NAME##_entry*, NAME, FREEF, CLONEF)\
                                             \
 int         NAME ## _isset(NAME **map, const char *key)\
 {                                           \

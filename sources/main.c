@@ -72,7 +72,7 @@ int main(int ac, char **av)
 		.parsers = parsers,
 		.preprocessors = preprocessors,
 	// TODO: .compilers = ...
-		.objects = {0,0,0},
+		.data = {0,0,0, 0, 0},
 	};
 
 

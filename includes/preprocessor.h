@@ -10,8 +10,7 @@ typedef enum
 }	preprocessor_action;
 typedef preprocessor_action (*macro)(cedilla_context *, ast_list *);
 DEF_KLIST_PROTO(macro, preprocessor_klist)
-DEF_KLIST(macro, preprocessor_klist, free, strdup)
-
+DEF_KLIST(macro, preprocessor_klist, free, ((void*(*)(void*))0))
 
 /*
 *	TODO:
@@ -54,7 +53,7 @@ typedef struct s_ast_macro_result
 	ast_list	*l;
 }	ast_macro_result;
 
-ast_macro_result	_match(cedilla_context *ctx, ast_list *l, ...)
+ast_macro_result	_match(ast_list *l, ...)
 {
 	ast_macro_result	out = {0, 0};
 	va_list				ap;

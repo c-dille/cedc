@@ -11,8 +11,7 @@ typedef enum
 typedef const char *(*compiler)(cedilla_context *ctx, ast_list *l);
 
 DEF_KLIST_PROTO(compiler, compiler_list)
-DEF_KLIST(compiler, compiler_list, free)
-
+DEF_KLIST(compiler, compiler_list, free, ((void*(*)(void*))0))
 
 /*
 bool compile(cedilla_context *ctx, ast_list *l)
