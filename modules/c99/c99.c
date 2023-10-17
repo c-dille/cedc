@@ -6,18 +6,103 @@ DEF(OP);
 
 #include "types/types.c"
 
-int define_eol(cedilla_context *ctx, const char *src)
+typedef struct s_lpstr
+{
+	size_t	len;
+	char	*str;
+} lpstr;
+
+lpstr	lp(char *str)
+{
+	return ((lpstr){strlen(str), str});
+}
+
+void	lpstr_free(lpstr str)
+{
+	str.len = 0;
+	free(str.str);
+}
+
+lpstr	lpstr_clone(lpstr str)
+{
+	return (lpstr){.len = str.len, .str = strdup(str.str)};
+}
+
+DEF_LIST_PROTO(lpstr, lpstr_list);
+DEF_LIST(lpstr, lpstr_list, lpstr_free, lpstr_clone);
+
+bool	lpstr_begins_with(lpstr haystack, const char *needle)
+{
+	return (!strncmp(haystack.str, needle, haystack.len));
+}
+
+typedef struct s_token_representation
+{
+	union
+	{
+		lpstr		token;
+		lpstr		to;
+	};
+	lpstr		to;
+	const char 	*type;
+	bool		until_unescaped;
+}	token_representation;
+
+DEF_LIST_PROTO(token_representation, token_representation_list);
+DEF_LIST(token_representation, token_representation_list, 0, 0);
+
+lpstr_list 	*g_tokens = 0;
+
+parser_action  token(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	(void) ctx;
-	(void) src;
+	token_representation_list	*it;
+
+	it = g_tokens;
+	while (it)
+	{
+		it = it->next;
+	}
+	if ((len = lpstr_list_contains_begin(g_eols, fmt)))
+	{
+		(void) len;
+		// todo : handle lines longer than one
+		return PARSE_NEW_LINE;
+	}
+	return NEXT_SYNTAX;
+}
+
+DEF(EOL)
+token_representation_list *define_eol(cedilla_context *ctx, const char *src)
+{
+	return token_representation_list_add(g_tokens, (token_representation){
+		.token = {.str = src, .len = strlen(src)},
+		.to = {.len = 0},
+		.type = EOL,
+		.until_escaped = false
+	});
 	return 1;
 }
 
 int define_space(cedilla_context *ctx, const char *src)
 {
 	(void) ctx;
-	(void) src;
+	str_list_add(g_spaces, strdup(src));
 	return 1;
+}
+
+parser_action   space(cedilla_context *ctx, const char *fmt, ast_list *ast)
+{
+	(void) ctx;
+	lpstr_list	*it;
+	size_t len;
+
+	if ((len = lpstr_list_contains_begin(g_eols, fmt)))
+	{
+		// todo : handle lines longer than one
+		return len;
+	}
+	return NEXT_SYNTAX;
 }
 
 int	define_comment(cedilla_context *ctx, const char *from, const char *to)

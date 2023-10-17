@@ -131,7 +131,7 @@ void   NAME ## _del(NAME **l, NAME *k)  \
         if (it == k)					\
         {								\
             if (FREEF)		            \
-                (FREEF)(it->data);		\
+                ((void(*)(TYPE))FREEF)(it->data);		\
             free(it);					\
             *prev = swp;				\
         }								\
@@ -151,7 +151,7 @@ void    NAME ## _free(NAME *l)\
     {									\
         swp = it->next;					\
         if (FREEF)			            \
-                (FREEF)(it->data);	\
+                ((void(*)(TYPE))FREEF)(it->data);	\
         free(it);						\
         it = swp;						\
     }									\
@@ -166,7 +166,7 @@ NAME    * NAME ## _clone(NAME *l)\
     while (it)							\
     {									\
 		if (CLONEF)						\
-			NAME ## _add(&out, CLONEF(it->data));\
+			NAME ## _add(&out, ((TYPE(*)(TYPE)) CLONEF)(it->data));\
 		else							\
 			NAME ## _add(&out, it->data);\
         it = it->next;					\

@@ -11,6 +11,10 @@ typedef enum
 }   parser_action;
 typedef struct s_cedilla_context cedilla_context;
 typedef parser_action(*parser)(cedilla_context *ctx, const char *fmt, ast_list *ast);
+
+DEF_LIST_PROTO(parser, parser_list);
+DEF_LIST(parser, parser_list, free, ((void*(*)(void*))0));
+
 DEF_KLIST_PROTO(parser, parser_klist);
 DEF_KLIST(parser, parser_klist, free, ((void*(*)(void*))0));
 
