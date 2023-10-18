@@ -112,6 +112,8 @@ int ast_check_deref(ast_list *ast, const char *file, int line, const char *func)
 
 const ull max_depth = 20;
 
+DEF(RAW)
+DEF(SPACE)
 DEF(EOL)
 
 ull   parse(cedilla_context *ctx, const char *fmt, ast_list *out)
@@ -145,12 +147,12 @@ ull   parse(cedilla_context *ctx, const char *fmt, ast_list *out)
 				break;
 			else if (pa == NEXT_SYNTAX)
 				;
-			else if (pa == PARSE_NEW_LINE)
+			/*else if (pa == PARSE_NEW_LINE)
 			{
 				fmt += 1;
 
 				break ;
-			}
+			}*/
 			else
 			{
 				fmt += pa;

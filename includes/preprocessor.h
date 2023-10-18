@@ -12,6 +12,8 @@ typedef preprocessor_action (*macro)(cedilla_context *, ast_list *);
 DEF_KLIST_PROTO(macro, preprocessor_klist)
 DEF_KLIST(macro, preprocessor_klist, free, ((void*(*)(void*))0))
 
+DEF(COMMENT)
+
 /*
 *	TODO:
 *

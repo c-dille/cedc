@@ -26,8 +26,11 @@ lpstr	lpstr_clone(lpstr str)
 DEF_LIST_PROTO(lpstr, lpstr_list);
 DEF_LIST(lpstr, lpstr_list, lpstr_free, lpstr_clone);
 
-bool	lpstr_begins_with(lpstr haystack, const char *needle)
+size_t	lpstr_prefix_str(lpstr haystack, const char *needle)
 {
-	return (!strncmp(haystack.str, needle, haystack.len));
+	if (!strncmp(haystack.str, needle, haystack.len))
+		return haystack.len;
+	return 0;
 }
+
 #endif

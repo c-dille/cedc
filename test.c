@@ -16,6 +16,9 @@ char *findfirstunescaped(const char *str, const char *c)
 	return NULL;
 }
 
+typedef int test;
+typedef unsigned p;
+
 int main()
 {
 	printf("%i %i", test(41, 42));
@@ -32,4 +35,9 @@ int main()
 	{
 		printf("Not found\n");
 	}
+
+	int i;
+
+	i &= 2;
+
 }
