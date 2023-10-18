@@ -2,18 +2,6 @@
 # define CEDILLA_H
 # include <cedilla.h>
 
-char* findlastunescaped(const char* str, char c) {
-    int i = 0;
-
-    while (str[i]) {
-        if (str[i] == c && (i == 0 || str[i - 1] != '\\')) {
-            return (char*)&str[i];
-        }
-        i += 1;
-    }
-
-    return NULL;
-}
 
 int isidentifier(char ch) {
     return isalnum(ch) || ch == '_';
@@ -77,19 +65,7 @@ parser_action	operator(cedilla_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
-parser_action   quote(cedilla_context *ctx, const char *fmt, ast_list *ast)
-{
-	(void) ctx;
-	if (*fmt == '\'')
-	{
-		char *lastunescaped = findlastunescaped(fmt + 1, '\'');
-		if (!lastunescaped)
-			parse_error(ctx, "unclosed simple quote.");
-		ast_push(ast, QUOTE, strndup(fmt + 1, lastunescaped - fmt - 1));
-		return lastunescaped - fmt + 1;// + 500;
-	}
-	return NEXT_SYNTAX;
-}
+
 
 parser_action   dquote(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
@@ -201,6 +177,7 @@ parser_action   endbracket(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	if (*fmt == ']')
 	{
+		// when stopping parser, also increment fmt ...
 		if (ast_type(ast_parent(ast)) != BRACKET)
 			parse_error(ctx, "unexpected closing bracket.");
 		return STOP_PARSER;

@@ -26,6 +26,7 @@ bool preprocess(cedilla_context *ctx, ast_list *l)
 	{
 		if (depth++ > 25)
 			parse_error(ctx, "depth exceed while running macro name '%s'.", it->data->key);
+
 		preprocessor_action pa = it->data->value(ctx, l);
 
 		if (pa == RESTART_PREPROCESSOR)
@@ -53,6 +54,11 @@ typedef struct s_ast_macro_result
 	ast_list	*l;
 }	ast_macro_result;
 
+/*
+
+TODO : skip if within a comment
+
+*/
 ast_macro_result	_match(ast_list *l, ...)
 {
 	ast_macro_result	out = {0, 0};

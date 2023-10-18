@@ -14,6 +14,7 @@
 # include "./file.h"
 # include "./list.h"
 # include "./klist.h"
+# include "./lpstr.h"
 
 # define IS_EMPTY(...) ( sizeof( (char[]){#__VA_ARGS__} ) == 1 )
 # define STR(...) #__VA_ARGS__

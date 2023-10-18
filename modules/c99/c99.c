@@ -6,80 +6,131 @@ DEF(OP);
 
 #include "types/types.c"
 
-typedef struct s_lpstr
-{
-	size_t	len;
-	char	*str;
-} lpstr;
-
-lpstr	lp(char *str)
-{
-	return ((lpstr){strlen(str), str});
-}
-
-void	lpstr_free(lpstr str)
-{
-	str.len = 0;
-	free(str.str);
-}
-
-lpstr	lpstr_clone(lpstr str)
-{
-	return (lpstr){.len = str.len, .str = strdup(str.str)};
-}
-
-DEF_LIST_PROTO(lpstr, lpstr_list);
-DEF_LIST(lpstr, lpstr_list, lpstr_free, lpstr_clone);
-
-bool	lpstr_begins_with(lpstr haystack, const char *needle)
-{
-	return (!strncmp(haystack.str, needle, haystack.len));
-}
+/*
+	TODO : do grouping in preprocessing phase
+*/
 
 typedef struct s_token_representation
 {
 	union
 	{
 		lpstr		token;
-		lpstr		to;
+		lpstr		from;
 	};
 	lpstr		to;
 	const char 	*type;
-	bool		until_unescaped;
 }	token_representation;
 
 DEF_LIST_PROTO(token_representation, token_representation_list);
 DEF_LIST(token_representation, token_representation_list, 0, 0);
 
-lpstr_list 	*g_tokens = 0;
+token_representation_list 		*g_tokens = 0;
+token_representation_list		*g_string_delimiters = 0;
+token_representation_list		*g_comment_delimiters = 0;
 
-parser_action  token(cedilla_context *ctx, const char *fmt, ast_list *ast)
+parser_action	identifier(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
 	(void) ctx;
-	token_representation_list	*it;
-
-	it = g_tokens;
-	while (it)
+	ull	len = 0;
+	while (isidentifier(fmt[len]))
+		len += 1;
+	if (len)
 	{
-		it = it->next;
-	}
-	if ((len = lpstr_list_contains_begin(g_eols, fmt)))
-	{
-		(void) len;
-		// todo : handle lines longer than one
-		return PARSE_NEW_LINE;
+		ast_push(ast, IDENTIFIER, strndup(fmt, len));
+		return len;
 	}
 	return NEXT_SYNTAX;
 }
 
-DEF(EOL)
+char *findfirstunescaped(const char *str, lpstr c)
+{
+	int i = 0;
+
+	while (str[i])
+	{
+		if (!strncmp(str + i, c.str, c.len) && (i == 0 || str[i - 1] != '\\'))
+			return (char *)&str[i];
+		i += 1;
+	}
+	return NULL;
+}
+
+parser_action   string(cedilla_context *ctx, const char *fmt, ast_list *ast)
+{
+	(void) ctx;
+	token_representation_list	*it;
+	size_t 						len;
+
+	it = g_string_delimiters;
+	while (it)
+	{
+		if ((len = lpstr_list_contains_begin(it->data.from, fmt)))
+		{
+			char *lastunescaped = findfirstunescaped(fmt + 1, it->data.to);
+			if (!lastunescaped)
+				parse_error(ctx, "unclosed string.");
+			ast_push(
+				ast,
+				it->data.type,
+				strndup(fmt + it->data.from.len, lastunescaped - fmt - it->data.to.len)
+			);
+			return lastunescaped - fmt + 1;// + 500;
+	}
+
+		it = it->next;
+	}
+	return NEXT_SYNTAX;
+}
+
+parser_action  token(cedilla_context *ctx, const char *fmt, ast_list *ast)
+{
+	(void) 						ctx;
+	token_representation_list	*it;
+	size_t 						len;
+	size_t						new_len;
+
+	it = g_tokens;
+	while (it)
+	{
+		if ((len = lpstr_list_contains_begin(it->data.to, fmt)))
+		{
+			if (ast_type(ast_parent(ast)) != it->data.type)
+				parse_error(ctx, "unexpected closing [%s].", it->data.type);
+			ast_push(ast_parent(ast), it->data.type, it->data.to.str);
+			return STOP_PARSER;
+		}
+		else if ((len = lpstr_list_contains_begin(it->data.from, fmt)))
+		{
+			if (it->data.to.len)
+			{
+				return
+					len
+					+ it->data.to.len
+					+ parse(
+						ctx,
+						fmt + len,
+						ast_push(
+							ast,
+							it->data.type,
+							strdup(strdup(it->data.token.str))
+						)->data.childs
+					);
+			}
+			ast_push(ast, it->data.type, strdup(it->data.token.str));
+			return len;
+		}
+		it = it->next;
+	}
+	return NEXT_SYNTAX;
+}
+
 token_representation_list *define_eol(cedilla_context *ctx, const char *src)
 {
 	return token_representation_list_add(g_tokens, (token_representation){
 		.token = {.str = src, .len = strlen(src)},
 		.to = {.len = 0},
 		.type = EOL,
-		.until_escaped = false
+		.until_unescaped = false
 	});
 	return 1;
 }
