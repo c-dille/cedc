@@ -1,5 +1,7 @@
+cedilla_load ./modules/c99/c99
 #include <stdio.h>
 #include <string.h>
+
 
 #define test(...) __VA_ARGS__
 
@@ -18,6 +20,7 @@ char *findfirstunescaped(const char *str, const char *c)
 
 typedef int test;
 typedef unsigned p;
+
 
 int main()
 {

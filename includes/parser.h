@@ -4,8 +4,7 @@
 
 typedef enum
 {
-    NEXT_SYNTAX = -2,
-	PARSE_NEW_LINE = -1,
+    NEXT_SYNTAX = -1,
     STOP_PARSER = 0,
     PARSE_NEXT_CHAR = 1,
 }   parser_action;
@@ -35,6 +34,7 @@ struct s_cedilla_context
 	parser_klist			*parsers;
 	object					data;
 	preprocessor_klist		*preprocessors;
+	bool					is_eol;
 
 	// TODO: compiler_klist
 };
@@ -112,10 +112,6 @@ int ast_check_deref(ast_list *ast, const char *file, int line, const char *func)
 
 const ull max_depth = 20;
 
-DEF(RAW)
-DEF(SPACE)
-DEF(EOL)
-
 ull   parse(cedilla_context *ctx, const char *fmt, ast_list *out)
 {
 	parser_action 	pa;
@@ -147,22 +143,17 @@ ull   parse(cedilla_context *ctx, const char *fmt, ast_list *out)
 				break;
 			else if (pa == NEXT_SYNTAX)
 				;
-			/*else if (pa == PARSE_NEW_LINE)
-			{
-				fmt += 1;
-
-				break ;
-			}*/
 			else
 			{
 				fmt += pa;
-				if (out->data.type == EOL)
+				if (ctx->is_eol)
 				{
 					ctx->line += 1;
 					ctx->collumn = 1;
+					ctx->is_eol = false;
 				}
-				else if (pa == PARSE_NEXT_CHAR)
-					ctx->collumn += 1;
+				else
+					ctx->collumn += pa;
 				break ;
 			}
 			it = it->next;
@@ -174,11 +165,11 @@ ull   parse(cedilla_context *ctx, const char *fmt, ast_list *out)
 		if (pa && !it)
 			parse_error(ctx, "unknow syntax [%.7s...].", fmt);
 		//printf("applying preprocessors in... %llu %llu\n", ctx->line, ctx->collumn);
-		if (pa != PARSE_NEW_LINE)
+		/*if (pa != PARSE_NEW_LINE)
 		{
 			//printf("pa=%i\n", pa);
 			preprocess(ctx, ast_list_last(out));
-		}
+		}*/
 	}
 	if (!*fmt && oj_depth)
 		parse_error(ctx, "opened pair. depth=%llu [%.10s]", oj_depth, ctx->begin_ptr);

@@ -31,6 +31,8 @@ parser_action   cedilla_load(cedilla_context *ctx, const char *fmt, ast_list *as
 			printf("Loaded module path: %s\n", full_path);
 			_load_module(full_path, ctx);
 
+			ctx->is_eol = true;
+
 			return (line_end - fmt + 1);
 		}
 	}
@@ -73,6 +75,7 @@ int main(int ac, char **av)
 		.preprocessors = preprocessors,
 	// TODO: .compilers = ...
 		.data = {0,0,0, 0, 0},
+		.is_eol = false
 	};
 
 

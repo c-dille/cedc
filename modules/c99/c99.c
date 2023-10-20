@@ -1,5 +1,9 @@
 #include "c99.h"
 
+DEF(RAW)
+DEF(SPACE)
+DEF(EOL)
+
 DEF(BRACE)
 DEF(PARENTHESIS)
 DEF(BRACKET)
@@ -9,6 +13,11 @@ DEF(DQUOTE)
 DEF(QUOTE)
 DEF(KEYWORD)
 DEF(TYPE)
+
+DEF(NUM)
+DEF(ID)
+
+DEF(CHAR)
 
 typedef struct
 {
@@ -32,6 +41,8 @@ parser_action  token(cedilla_context *ctx, const char *fmt, ast_list *ast)
 	{
 		if ((len = lpstr_prefix_str(it->data.token, fmt)))
 		{
+			if (it->data.type == EOL)
+				ctx->is_eol = true;
 			ast_push(ast, it->data.type, strndup(fmt, len));
 			return len;
 		}
@@ -85,7 +96,16 @@ char *findfirstunescaped(const char *str, const char *c)
 
 	while (str[i])
 	{
-		if (!strncmp(str + i, c, strlen(c)) && (i == 0 || str[i - 1] != '\\'))
+		if (!strncmp(str + i, c, strlen(c))
+			&& (
+				!(
+				(i >= 1) && (str[i - 1] == '\\')
+				)
+			|| (
+					(i >= 2) && (str[i - 1] == '\\' && str[i - 2] == '\\')
+				)
+			)
+		)
 			return (char *)&str[i];
 		i += 1;
 	}
@@ -101,7 +121,7 @@ parser_action   quote(cedilla_context *ctx, const char *fmt, ast_list *ast)
 		if (!lastunescaped)
 			parse_error(ctx, "unclosed quote.");
 	//	printf("lastUnesc: [%s\n]", lastunescaped);
-		ast_push(ast, DQUOTE, strndup(fmt + 1, lastunescaped - fmt - 1));
+		ast_push(ast, CHAR, strndup(fmt + 1, lastunescaped - fmt - 1));
 		return lastunescaped - fmt + 1;
 	}
 	return NEXT_SYNTAX;
@@ -195,13 +215,46 @@ parser_action   endbracket(cedilla_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
+
+parser_action   identifier(cedilla_context *ctx, const char *fmt, ast_list *ast)
+{
+	(void) ctx; (void) ast;
+	int len = 0;
+	if (isalpha(*fmt) || *fmt == '_')
+	{
+		len += 1;
+		while (isalpha(fmt[len]) || isdigit(fmt[len]) || fmt[len] == '_')
+		{
+			len += 1;
+		}
+		ast_push(ast, ID, strndup(fmt, len));
+		return len;
+	}
+	return NEXT_SYNTAX;
+}
+
+parser_action   number(cedilla_context *ctx, const char *fmt, ast_list *ast)
+{
+	(void) ctx;
+	int len = 0;
+	if (isdigit(*fmt) || fmt[len] == '.')
+	{
+		len += 1;
+		while (isalpha(fmt[len]) || isdigit(fmt[len]) || fmt[len] == '.')
+		{
+			len += 1;
+		}
+		ast_push(ast, NUM, strndup(fmt, len));
+		return len;
+	}
+	return NEXT_SYNTAX;
+}
+
 int	load_module(cedilla_context *ctx, ...)
 {
 	(void) ctx;
 
-	print("Loading c99 module... ");
-
-	parser_klist_set(&(ctx->parsers), KV(token));
+	print("Loading c99 module... \n");
 
 	parser_klist_set(&(ctx->parsers), KV(comment));
 	parser_klist_set(&(ctx->parsers), KV(mlcomment));
@@ -211,18 +264,16 @@ int	load_module(cedilla_context *ctx, ...)
 	parser_klist_set(&(ctx->parsers), KV(endparenthesis));
 	parser_klist_set(&(ctx->parsers), KV(bracket));
 	parser_klist_set(&(ctx->parsers), KV(endbracket));
-
+	parser_klist_set(&(ctx->parsers), KV(brace));
+	parser_klist_set(&(ctx->parsers), KV(endbrace));
+	parser_klist_set(&(ctx->parsers), KV(token));
+	parser_klist_set(&(ctx->parsers), KV(identifier));
+	parser_klist_set(&(ctx->parsers), KV(number));
 
 	define_token(EOL, "\n");
 
 	define_token(SPACE, "\t");
 	define_token(SPACE, " ");
-
-
-
-	define_token(DQUOTE, "\"");
-	define_token(QUOTE, "'");
-
 
 	define_token(OP, "+=");
 	define_token(OP, "-=");
@@ -234,6 +285,11 @@ int	load_module(cedilla_context *ctx, ...)
 	define_token(OP, "^=");
 	define_token(OP, "&=");
 	define_token(OP, "%=");
+	define_token(OP, "|=");
+	define_token(OP, "!");
+
+	define_token(OP, "||");
+	define_token(OP, "&&");
 
 	define_token(OP, "+");
 	define_token(OP, "-");
@@ -245,14 +301,17 @@ int	load_module(cedilla_context *ctx, ...)
 	define_token(OP, "^");
 	define_token(OP, "&");
 	define_token(OP, "%");
+	define_token(OP, "|");
+	define_token(OP, "!");
 
 	define_token(OP, ",");
 	define_token(OP, ";");
+	define_token(OP, ":");
 	define_token(OP, ".");
 
 	define_token(OP, "...");
-
 	define_token(OP, "#");
+	define_token(OP, "\\");
 
 	define_token(KEYWORD, "return");
 	define_token(KEYWORD, "continue");
