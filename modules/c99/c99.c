@@ -59,6 +59,23 @@ token_representation_list	*define_token(const char *type, char *str)
 	);
 }
 
+bool _define_tokens(const char *type, ...) {
+    va_list ap;
+    const char *str;
+
+    va_start(ap, type);
+    while ((str = va_arg(ap, const char *))) { // const char* as we're expecting a pointer
+        if (!define_token(type, (char*)str)) {
+            va_end(ap);
+            return false;
+        }
+    }
+    va_end(ap);
+    return true;
+}
+
+#define define_tokens(...) _define_tokens(__VA_ARGS__, NULL) // use NULL, not 0
+
 
 parser_action   comment(cedilla_context *ctx, const char *fmt, ast_list *ast)
 {
@@ -250,6 +267,39 @@ parser_action   number(cedilla_context *ctx, const char *fmt, ast_list *ast)
 	return NEXT_SYNTAX;
 }
 
+preprocessor_action   matchtest(cedilla_context *ctx, ast_list *ast)
+{
+	(void) ctx;
+	ast_macro_result out;
+
+	out = match(ast, OP);
+	//exit(1);
+	if (out.match_size)
+	{
+		printf("Got a match\n");
+				return RESTART_PREPROCESSOR;
+
+		//exit(1);
+
+		printf("21 !\n");
+		while (out.match_size--)
+		{
+			ast = ast->prev;
+		}
+
+
+		printf("// !\n");
+		ast_list_free(ast->next);
+
+		printf("// !\n");
+		ast_push(ast, OP, "test");
+
+		printf("// !\n");
+		return RESTART_PREPROCESSOR;
+	}
+	return NEXT_PREPROCESSOR;
+}
+
 int	load_module(cedilla_context *ctx, ...)
 {
 	(void) ctx;
@@ -270,66 +320,37 @@ int	load_module(cedilla_context *ctx, ...)
 	parser_klist_set(&(ctx->parsers), KV(identifier));
 	parser_klist_set(&(ctx->parsers), KV(number));
 
+	preprocessor_klist_set(&(ctx->preprocessors), KV(matchtest));
+
+	// Spaces
 	define_token(EOL, "\n");
+	define_tokens(SPACE, "\t", " ");
 
-	define_token(SPACE, "\t");
-	define_token(SPACE, " ");
 
-	define_token(OP, "+=");
-	define_token(OP, "-=");
-	define_token(OP, "*=");
-	define_token(OP, "/=");
-	define_token(OP, "<=");
-	define_token(OP, ">=");
-	define_token(OP, "==");
-	define_token(OP, "^=");
-	define_token(OP, "&=");
-	define_token(OP, "%=");
-	define_token(OP, "|=");
-	define_token(OP, "!");
+	// Comparison operators
+	define_tokens(OP, "<=", ">=", "==", ">", "<");
 
-	define_token(OP, "||");
-	define_token(OP, "&&");
+	// Assignment operators
+	define_tokens(OP, "+=", "-=", "*=", "/=", "^=", "&=", "%=", "|=", "=");
 
-	define_token(OP, "+");
-	define_token(OP, "-");
-	define_token(OP, "*");
-	define_token(OP, "/");
-	define_token(OP, "<");
-	define_token(OP, ">");
-	define_token(OP, "=");
-	define_token(OP, "^");
-	define_token(OP, "&");
-	define_token(OP, "%");
-	define_token(OP, "|");
-	define_token(OP, "!");
+	// Logical operators
+	define_tokens(OP, "||", "&&", "|", "&", "!");
 
-	define_token(OP, ",");
-	define_token(OP, ";");
-	define_token(OP, ":");
-	define_token(OP, ".");
+	// Arithmetic operators
+	define_tokens(OP, "+", "-", "*", "/", "^", "&", "%", "|");
 
-	define_token(OP, "...");
-	define_token(OP, "#");
-	define_token(OP, "\\");
+	// Other operators
+	define_tokens(OP, ",", ";", "?", ":", ".", "...", "#", "\\");
 
-	define_token(KEYWORD, "return");
-	define_token(KEYWORD, "continue");
-	define_token(KEYWORD, "break");
-	define_token(KEYWORD, "goto");
+	// Control flow keywords
+	define_tokens(KEYWORD, "return", "continue", "break", "goto");
 
-	define_token(TYPE, "void");
-	define_token(TYPE, "signed");
-	define_token(TYPE, "unsigned");
-	define_token(TYPE, "short");
-	define_token(TYPE, "long");
-	define_token(TYPE, "int");
-	define_token(TYPE, "auto");
-	define_token(TYPE, "char");
-	define_token(TYPE, "_Bool");
-	define_token(TYPE, "float");
-	define_token(TYPE, "double");
-	define_token(TYPE, "_Complex");
+	// Data types
+	define_tokens(TYPE, "void", "signed", "unsigned", "short", "long", "int",
+		"auto", "char", "_Bool", "float", "double", "_Complex");
+
+
+	//define_tokens(KEYWORD, "alignof", "_Alignof", "sizeof", "typeof");
 
 	print("done.\n");
 	return 0;

@@ -165,11 +165,11 @@ ull   parse(cedilla_context *ctx, const char *fmt, ast_list *out)
 		if (pa && !it)
 			parse_error(ctx, "unknow syntax [%.7s...].", fmt);
 		//printf("applying preprocessors in... %llu %llu\n", ctx->line, ctx->collumn);
-		/*if (pa != PARSE_NEW_LINE)
-		{
+		//if (pa != PARSE_NEW_LINE)
+		//{
 			//printf("pa=%i\n", pa);
-			preprocess(ctx, ast_list_last(out));
-		}*/
+		preprocess(ctx, ast_list_last(out));
+		//}
 	}
 	if (!*fmt && oj_depth)
 		parse_error(ctx, "opened pair. depth=%llu [%.10s]", oj_depth, ctx->begin_ptr);

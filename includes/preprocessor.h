@@ -56,69 +56,68 @@ typedef struct s_ast_macro_result
 	ast_list	*l;
 }	ast_macro_result;
 
-/*
-
-TODO : skip if within a comment
-
-*/
-ast_macro_result	_match(ast_list *l, ...)
-{
-	ast_macro_result	out = {0, 0};
-	va_list				ap;
-	const char			*str;
+ast_macro_result _match(ast_list *l, ...) {
+    ast_macro_result out = {0, 0};
+    va_list ap;
+    const char *str;
 
 	va_start(ap, l);
-	while ((str = va_arg(ap, const char*)))
-	{
-		if (str == UNTIL)
-		{
-			str = va_arg(ap, const char *);
+    while ((str = va_arg(ap, const char*))) {
+        if (str == UNTIL) {
+            str = va_arg(ap, const char *);
 
-			if (!str)
-			{
-				// ? no end condition ?
-			}
+            if (!str) {
+                va_end(ap);
+                // We can decide to handle this error according to the logic of the rest of our application
+                exit(EXIT_FAILURE); // or return an error code
+            }
 
-			str = va_arg(ap, const char *);
-			if (str == NOT)
-			{
+            // handle NOT after UNTIL
+            if (str == NOT) {
+                str = va_arg(ap, const char *); // the type to NOT match
+                while (l && ast_type(l) != str) {
+                    out.match_size += 1;
+                    l = l->prev;
+                }
+            } else { // regular UNTIL
+                while (l && ast_type(l) != str) {
+                    out.match_size += 1;
+                    l = l->prev;
+                }
+            }
 
-			}
+            if (!l || ast_type(l) != str) {
+                va_end(ap);
+                // Handle error: either return an error code or take appropriate action
+                return (ast_macro_result) {0, 0}; // for instance
+            }
+        } else if (str == NOT) {
+            str = va_arg(ap, const char *);
+            if (!str || ast_type(l) == str) { // failed NOT match
+                va_end(ap);
+                return (ast_macro_result) {0, 0};
+            }
+            out.match_size += 1;
+        } else if (str == ANY || ast_type(l) == str) {
+            out.match_size += 1;
+        } else { // no match
+            va_end(ap);
+            return (ast_macro_result) {0, 0};
+        }
+        l = l->prev;
+    }
+    va_end(ap);
 
-			// ...
+    // clone matched nodes
+    int match_size = out.match_size;
+    while (l && match_size--) {
+        ast_list_add_front(&(out.l), ast_node_clone(l->data));
+        l = l->prev; // move back through the original list
+    }
 
-			while (l && ast_type(l) != str)
-			{
-				out.match_size += 1;
-				l = l->prev;
-			}
-			if (!l && ast_type(l) != str)
-			{
-				// error
-			}
-			return	(ast_macro_result) {0, 0};
-		}
-		else if (str == NOT)
-		{
-			str = va_arg(ap, const char *);
-			if (str && ast_type(l) != str)
-				out.match_size += 1;
-			else
-				return	(ast_macro_result) {0, 0};
-		}
-		else if (str == ANY || ast_type(l) == str)
-			out.match_size += 1;
-		else
-			return	(ast_macro_result) {0, 0};
-		l = l->prev;
-	}
-	va_end(ap);
-
-	int	match_size = out.match_size;
-	while (match_size--)
-		ast_list_add_front(&(out.l), ast_node_clone(l->data));
-	return out;
+    return out;
 }
-#define match(...) _match(__VA_ARGS__, 0);
+
+#define match(...) _match(__VA_ARGS__, NULL)
 
 #endif
