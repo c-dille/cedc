@@ -43,7 +43,10 @@ parser_action  token(cedilla_context *ctx, const char *fmt, ast_list *ast)
 		{
 			if (it->data.type == EOL)
 				ctx->is_eol = true;
-			ast_push(ast, it->data.type, strndup(fmt, len));
+			else if (it->data.type == SPACE)
+				;
+			else
+				ast_push(ast, it->data.type, strndup(fmt, len));
 			return len;
 		}
 		it = it->next;
@@ -272,30 +275,23 @@ preprocessor_action   matchtest(cedilla_context *ctx, ast_list *ast)
 	(void) ctx;
 	ast_macro_result out;
 
-	out = match(ast, OP);
+	out = match(ast, OP, ID);
+	//return NEXT_PREPROCESSOR;
+
 	//exit(1);
 	if (out.match_size)
 	{
-		printf("Got a match\n");
-				return RESTART_PREPROCESSOR;
-
-		//exit(1);
-
-		printf("21 !\n");
+		printf("match size = %i\n", out.match_size);
 		while (out.match_size--)
 		{
 			ast = ast->prev;
 		}
 
+		//ast_list_free(ast->next);
+		//ast_push(ast, OP, "test");
 
-		printf("// !\n");
-		ast_list_free(ast->next);
-
-		printf("// !\n");
-		ast_push(ast, OP, "test");
-
-		printf("// !\n");
-		return RESTART_PREPROCESSOR;
+		// printf("// !\n");
+		return NEXT_PREPROCESSOR;
 	}
 	return NEXT_PREPROCESSOR;
 }

@@ -1,4 +1,4 @@
-cc = cc -Wall -Werror -Wextra -g #-fsanitize=address
+cc = cc -Wall -Werror -Wextra #-g #-fsanitize=address
 rm = rm -rf
 #
 sources_dir = sources/

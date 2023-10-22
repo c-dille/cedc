@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cédille</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .tilt:hover {
+            transform: rotate(-5deg);
+            transition: transform 0.5s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <!-- Navigation -->
+    <nav class="bg-gray-900 p-4 mt-0 fixed w-full z-10 top-0">
+        <div class="container mx-auto flex flex-wrap items-center">
+            <div class="flex w-full md:w-1/2 justify-center md:justify-start text-white font-extrabold">
+                <a class="text-white no-underline hover:text-gray-200 text-2xl pl-2" href="#">
+					<img src="cedilla-white.svg" alt="Cédille Hero Image" width="40" height="auto"/>
+				</a>
+            </div>
+            <div class="flex w-full pt-2 content-center justify-between md:w-1/2 md:justify-end">
+                <ul class="list-reset flex justify-between flex-1 md:flex-none items-center">
+                    <li class="mr-3">
+                        <a class="inline-block py-2 px-4 text-white no-underline" href="index.html">Acceuil</a>
+                    </li>
+                    <li class="mr-3">
+                        <a class="inline-block text-gray-400 no-underline hover:text-gray-200 py-2 px-4" href="packages.html">Paquets</a>
+                    </li>
+                    <li class="mr-3">
+                        <a class="inline-block text-gray-400 no-underline hover:text-gray-200 py-2 px-4" href="documentation.html">Documentation</a>
+                    </li>
+
+					<li class="mr-3">
+                        <a class="inline-block text-gray-400 no-underline hover:text-gray-200 py-2 px-4" href="tarifs.html">Tarifs</a>
+                    </li>
+                    <!-- Add more navigation items here -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="pt-24">
+        <div class="container px-3 mx-auto flex flex-wrap flex-col md:flex-row items-center">
+            <!--Left Col-->
+            <div class="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left">
+                <h1 class="my-4 text-5xl font-bold leading-tight">
+                    Cédille
+                </h1>
+                <p class="leading-normal text-2xl mb-8">
+					<p><i>La cédille (de l'espagnol cedilla, « petit z ») est un diacritique de l'alphabet latin. Elle ne se place en français que sous la lettre c, autant sous une minuscule que sous une majuscule : ç, Ç.
+						Elle est utilisée par plusieurs autres langues sous différentes lettres. </i></p>
+				</p>
+                <button class="mx-auto lg:mx-0 hover:underline bg-gray-800 text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg tilt">
+                    Commencer
+                </button>
+            </div>
+            <!--Right Col-->
+            <div class="w-full md:w-3/5 py-6 text-center">
+
+                <img class="w-full md:w-4/5 z-50" src="cedilla.svg" alt="Cédille Hero Image" />
+                <!-- Replace hero.png with your own image -->
+            </div>
+        </div>
+    </div>
+
+<!-- À propos du produit -->
+<section id="about" class="flex flex-wrap py-12 m-12">
+    <div class="w-full md:w-1/2 pr-0 md:pr-12">
+        <h2 class="text-3xl font-semibold">Flexibilité</h2>
+        <span class="text-lg mt-4"><p>Le système de macros au niveau AST permet de créer dynamiquement de nouvelles syntaxes dans votre code source sans le besoin de créer une extension externe pour un compilateur. Accélérez votre productivité tout en conservant une performance et une sécurité optimale. </p><br/><ul style="margin-left: 10px;" class="list-none md:list-disc text-lg mt-4"><li>Intéropabilité avec le CPP </li><li>Compile-time évalutations</li><li>Aucune limite de syntax</li></ul> </span>
+    </div>
+    <div class="w-full md:w-1/2 pl-0 md:pl-12 mt-8 md:mt-0">
+        <pre class="prettyprint" style="border: 0px !important;">
+print ced_preprocess { print 42 }
+// Use ced_preprocess to get compile-time values
+
+ced_macro
+{
+	auto out = match (FUNC_IMPL, IDENTIFIER, IDENTIFIER, BRACE)
+	if !strcmp(out.matches[1], "defer")
+	{
+		if !strcmp(out.matches[2], "scope")
+		{
+			decorate(out.matches[0]->data, "on_return", out.matches[3]);
+		}
+
+		if !strcmp(out.matches[2], "parent_scope")
+		{
+			decorate(out.matches[0]->data, "on_call", out.matches[3]);
+		}
+
+		if !strcmp(out.matches[2], "program_scope")
+		{
+			findMainFunction ... decorate with defer
+		}
+	}
+}
+
+</pre>
+    </div>
+</section>
+
+<!-- Optimisation personnalisée -->
+<section id="optimisation-personnalisee" class="flex flex-wrap py-12 m-12">
+    <div class="w-full md:w-1/2 order-2 md:order-1 pl-0 md:pl-12 mt-8 md:mt-0">
+        <pre class="prettyprint" style="border: 0px !important;">
+			#include networking/server/tcp
+			#include networking/server/http
+
+			auto tcpServer = new TcpServer(8080)
+			auto httpServer = new HttpServer(TcpServer)
+			auto pgLink = new OdbcClient(pgsql, 127.0.0.1)
+
+			httpServer.on('/bonjour', async lambda req, resp {
+				resp.print "Bienvenue sur la cédille!"
+			})
+
+			httpServer.on('/login', async lambda req, resp {
+				auto users = await pgLink.query {
+					select * from user
+					where email = resp.email and pw = hash(resp.pw)
+				}
+				if !users.length
+					resp.print "Email or password incorect"
+				else
+					auth(resp, users[0])
+			})
+
+			httpServer.run()
+			</pre>
+    </div>
+    <div class="w-full md:w-1/2 order-1 md:order-2 pr-0 md:pr-12">
+        <h2 class="text-3xl font-semibold">Performance</h2>
+        <p class="text-lg mt-4">Contrairement aux compilateurs classiques qui appliquent des optimisations générales, notre système de macros au niveau AST vous offre une flexibilité et une précision sans précédent, vous permettant d'effectuer des ajustements spécifiques à votre contexte et exigences de performance.
+
+			Au-delà de l'optimisation de code, notre système offre l'intégration avec FPGA pour une accélération matérielle supérieure, grâce à une fonction de load balancing sophistiquée et automatisée, libérant les développeurs des complexités techniques tout en maximisant les performances.
+		</p>
+    </div>
+</section>
+
+<!-- Intégration FPGA -->
+<section id="integration-fpga" class="flex flex-wrap py-12 m-12">
+    <div class="w-full md:w-1/2 pr-0 md:pr-12">
+        <h2 class="text-3xl font-semibold">Sécurité</h2>
+        <p class="text-lg mt-4">Refcount, array boud check, var lifetime; ptr safety</p>
+    </div>
+    <div class="w-full md:w-1/2 pl-0 md:pl-12 mt-8 md:mt-0">
+		<pre class="prettyprint" style="border: 0px !important;">
+void *ptr = malloc(42)
+defer scope { free(ptr) }
+// -> May also be parent_scope, program_scope.
+// Not defering immediatly after a defer
+// will result in a warning.
+
+void *ptr2 = malloc(42)
+ptr = 0;
+// -> Will free ptr and forbid its usage without
+// a rewriting using refcount.
+
+int arr[5]
+for item in arr
+	item = 0
+item[5] = '4'
+// -> Error : array bound check
+
+
+int arr[...] = {0, 0, 0};
+for item in arr
+{
+	arr[i] = arr[i + 1]
+	// Error : array bound check
+}
+// -> Dynamic size array declaration
+// allows you to safely model datas
+
+int *ptr = 4;
+*(ptr) = 5;
+// Error : invalid address dereference
+
+
+</pre>
+    </div>
+</section>
+
+
+<footer class="text-gray-400 bg-gray-900 body-font">
+	<div class="container px-5 py-8 mx-auto flex items-center sm:flex-row flex-col">
+	  <a href="#" class="flex title-font font-medium items-center md:justify-start justify-center text-white">
+		<span class="ml-3 text-xl">Cédille</span>
+	  </a>
+	  <p class="text-sm text-gray-400 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-800 sm:py-2 sm:mt-0 mt-4">© 2023
+		<a href="#" class="text-gray-500 ml-1" target="_blank" rel="noopener noreferrer"></a>
+	  </p>
+	  <span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
+		<a href="#" class="ml-3 text-gray-400">
+			<img src="twitter.svg" alt="X" height="40" width="40">
+		</a>
+		<a href="#" class="ml-3 text-gray-400">
+			<img style="margin-top: -6px;" src="mastodon.svg" alt="Mastodon" height="52" width="52">
+		</a>
+	  </span>
+	</div>
+  </footer>
+
+<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+
+</body>
+</html>

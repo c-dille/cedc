@@ -16,6 +16,20 @@ void ast_node_free(ast_node n);
 ast_node 	ast_node_clone(ast_node n);
 DEF_LIST(ast_node, ast_list, ast_node_free, ast_node_clone);
 								// def ast_list_object ?
+
+DEF(ROOT)
+
+void ast_set_parent(ast_list *l, ast_list *parent)
+{
+	ast_list *it = l;
+	while (it)
+	{
+		it->data.parent = parent;
+		ast_set_parent(it->data.childs, it);
+		it = it->next;
+	}
+}
+
 void ast_node_free( ast_node n)
 {
 	ast_list_free(n.childs);
@@ -32,12 +46,11 @@ ast_node 	ast_node_clone(ast_node n)
 
 	out.parent = 0;
 	out.type = n.type;
-	out.source = strdup(out.source);
+	out.source = n.source ? strdup(n.source) : 0;
 	out.data = n.data;
 	if (n.data.ptr && n.data.clone)
 		out.data.ptr = n.data.clone(n.data.ptr);
 	out.childs = ast_list_clone(n.childs);
-
 	return out;
 }
 
@@ -56,27 +69,16 @@ ast_list *ast_list_vnew(ull i, ...)
 	return (r);
 }
 
-void ast_set_parent(ast_list *l, ast_list *parent)
-{
-	ast_list *it = l;
-	while (it)
-	{
-		it->data.parent = parent;
-		ast_set_parent(it->data.childs, it);
-		it = it->next;
-	}
-}
-
 void ast_dump_helper(ast_list *l, int depth)
 {
-	ast_list *it = l;
-
-	(void)	it;
+	while (l && !strcmp(l->data.type, ROOT))
+		l = l->next;
 	if (!l)
 	{
 		printf("0\n");
 		return ;
 	}
+
 	printf("ast_list_vnew(%llu, \n", ast_list_count(l));
 	while (l)
 	{
@@ -101,7 +103,7 @@ void ast_dump(ast_list *l)
 {
 	printf("ast_set_parent(");
 	ast_dump_helper(l, 1);
-	printf(");\n");
+	printf(",0);\n");
 }
 
 

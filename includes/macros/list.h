@@ -151,13 +151,13 @@ void    NAME ## _free(NAME *l)\
     {									\
         swp = it->next;					\
         if (FREEF)			            \
-                ((void(*)(TYPE))FREEF)(it->data);	\
+                ((void(*)(TYPE))FREEF)(it->data);\
         free(it);						\
         it = swp;						\
     }									\
 }										\
                                         \
-NAME    * NAME ## _clone(NAME *l)\
+NAME    * NAME ## _clone(NAME *l)		\
 {										\
     NAME    *it;						\
     NAME    *out = 0;					\

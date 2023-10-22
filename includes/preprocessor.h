@@ -59,6 +59,7 @@ typedef struct s_ast_macro_result
 ast_macro_result _match(ast_list *l, ...) {
     ast_macro_result out = {0, 0};
     va_list ap;
+	ast_list 		*lb = l;
     const char *str;
 
 	va_start(ap, l);
@@ -100,21 +101,42 @@ ast_macro_result _match(ast_list *l, ...) {
             out.match_size += 1;
         } else if (str == ANY || ast_type(l) == str) {
             out.match_size += 1;
-        } else { // no match
+        } else  { // no match
             va_end(ap);
             return (ast_macro_result) {0, 0};
         }
+		lb = l;
         l = l->prev;
     }
     va_end(ap);
+	//out.l = 0;
 
+
+	out.l = ast_list_clone(lb);
+	if (out.l)
+		ast_set_parent(out.l->data.childs, out.l);
     // clone matched nodes
-    int match_size = out.match_size;
-    while (l && match_size--) {
-        ast_list_add_front(&(out.l), ast_node_clone(l->data));
-        l = l->prev; // move back through the original list
-    }
+    //int match_size = out.match_size;
+    /*while (lb && match_size--) {
+		printf("%p : %p\n", out.l, lb);
+		//ast_push(out.l, "lol", "+");
+		printf("data %p\n", lb->data.childs->data.data.ptr);
+		printf("type %s\n", lb->data.childs->data.type);
+		printf("src %s\n", lb->data.childs->data.source);
+		printf("parent %p\n", lb->data.childs->data.parent);
+		//strdup(0);
+		printf("childs %p\n", lb->data.childs->data.childs);
 
+
+	//ast_node_clone(lb->data);
+		ast_list_add_front(&(out.l), ast_node_clone(lb->data));
+		ast_set_parent(out.l->data.childs, out.l);
+
+
+
+        lb = lb->prev; // move back through the original list
+    }
+*/
     return out;
 }
 

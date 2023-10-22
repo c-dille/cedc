@@ -73,7 +73,7 @@ void ast_error(const char *msg, const char *file, int line, const char *func) {
 ast_list *ast_list_root(ast_list *root)
 {
 	return ast_list_new((ast_node) {
-		.type = "ROOT",
+		.type = ROOT,
 		.source = 0,
 		.data = {0, 0, 0, 0, 0},
 		.parent = root,
